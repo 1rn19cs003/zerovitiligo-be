@@ -1,6 +1,6 @@
 import prisma from '../../prisma.setup.js'
 
-export const getAllUsersData = async () => {
+export const getAllPatientsData = async () => {
   try {
     return await prisma.doctor.findMany();
   } catch (err) {

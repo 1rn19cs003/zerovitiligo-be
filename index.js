@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import cors from 'cors';
 import router from './src/routes/index.js';
 import errorMiddleware from './src/middleware/error.js';
 import prisma from './prisma.setup.js';
@@ -84,6 +85,11 @@ app.get('/live', (_req, res) => {
   });
 });
 
+
+app.use(cors({
+  origin: true, 
+  credentials: true
+}));
 
 app.use('/api', router);
 
