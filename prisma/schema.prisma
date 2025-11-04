@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -16,28 +10,26 @@ datasource db {
 }
 
 model Doctor {
-  id         String      @id @default(uuid())
-  name       String
-  email      String      @unique
-  password   String
-  role       DoctorRole  @default(ASSISTANT)
-  assistants Assistant[] @relation("DoctorAssistants")
-  patients   Patient[]
-  createdAt  DateTime    @default(now())
-
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  password       String
+  role           DoctorRole       @default(ASSISTANT)
+  createdAt      DateTime         @default(now())
+  assistants     Assistant[]      @relation("DoctorAssistants")
+  patients       Patient[]
   PatientHistory PatientHistory[]
 }
 
 model Assistant {
-  id        String    @id @default(uuid())
-  name      String
-  email     String    @unique
-  password  String
-  doctor    Doctor    @relation("DoctorAssistants", fields: [doctorId], references: [id])
-  doctorId  String
-  patients  Patient[]
-  createdAt DateTime  @default(now())
-
+  id             String           @id @default(uuid())
+  name           String
+  email          String           @unique
+  password       String
+  doctorId       String
+  createdAt      DateTime         @default(now())
+  doctor         Doctor           @relation("DoctorAssistants", fields: [doctorId], references: [id])
+  patients       Patient[]
   PatientHistory PatientHistory[]
 }
 
@@ -54,37 +46,37 @@ model Patient {
   vaccineDoses     Int?
   otherDisease     String?
   familyHistory    String?
-  images           Image[]
   status           Status           @default(INITIAL)
-  doctor           Doctor?          @relation(fields: [doctorId], references: [id])
   doctorId         String?
-  assistant        Assistant?       @relation(fields: [assistantId], references: [id])
   assistantId      String?
-  histories        PatientHistory[]
   createdAt        DateTime         @default(now())
+  images           Image[]
+  assistant        Assistant?       @relation(fields: [assistantId], references: [id])
+  doctor           Doctor?          @relation(fields: [doctorId], references: [id])
+  histories        PatientHistory[]
 }
 
 model Image {
   id         String   @id @default(uuid())
   url        String
-  patient    Patient  @relation(fields: [patientId], references: [id])
   patientId  String
   uploadedAt DateTime @default(now())
+  patient    Patient  @relation(fields: [patientId], references: [id])
 }
 
 model PatientHistory {
   id             String     @id @default(uuid())
-  patient        Patient    @relation(fields: [patientId], references: [id])
   patientId      String
-  doctor         Doctor?    @relation(fields: [doctorId], references: [id])
   doctorId       String?
-  assistant      Assistant? @relation(fields: [assistantId], references: [id])
   assistantId    String?
   lastMedicine   String?
   adviceGiven    String?
   lastInspection DateTime
   nextInspection DateTime?
   createdAt      DateTime   @default(now())
+  assistant      Assistant? @relation(fields: [assistantId], references: [id])
+  doctor         Doctor?    @relation(fields: [doctorId], references: [id])
+  patient        Patient    @relation(fields: [patientId], references: [id])
 }
 
 enum DoctorRole {
