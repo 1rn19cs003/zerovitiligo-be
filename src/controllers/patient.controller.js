@@ -25,6 +25,7 @@ export const createPatient = async (req, res, next) => {
             name,
             age,
             bodyWeight,
+            mobile,
             vitiligoDuration,
             currentMedicine,
             covidVaccine,
@@ -50,6 +51,7 @@ export const createPatient = async (req, res, next) => {
             name: name,
             age: parseInt(age),
             address: address,
+            mobile: mobile,
             vitiligoDuration: vitiligoDuration.toString() + " Years",
             currentMedicine: currentMedicine,
             familyHistory: familyHistory,
@@ -72,7 +74,7 @@ export const createPatient = async (req, res, next) => {
         if (error.code === 'P2002') {
             return res.status(409).json({
                 success: false,
-                message: `Patient ID conflict. Please try submission again.`,
+                message: `Incorrect Details. Please try submission again.`,
             });
         }
         next(error);

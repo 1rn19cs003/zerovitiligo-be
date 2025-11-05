@@ -38,6 +38,7 @@ model Patient {
   patientId  String  @unique
   name       String
   age        Int
+  mobile     String  @unique
   bodyWeight Float?
   address    String?
 
