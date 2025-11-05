@@ -23,51 +23,71 @@ export const generatePatientId = (date = new Date()) => {
 };
 
 
-export const patientValidationSchema = Yup.object().shape({
+export const patientValidationSchema = Yup.object({
+  // === Basic Details ===
   name: Yup.string()
-    .min(2, 'Name is too short')
-    .max(50, 'Name is too long')
-    .required('Name is required'),
-
-  address: Yup.string()
-    .min(5, 'Address is too short')
-    .max(200, 'Address is too long')
-    .required('Address is required'),
-
+    .trim()
+    .required("Name is required")
+    .min(2, "Name must be at least 2 characters"),
   age: Yup.number()
-    .typeError('Age must be a number')
-    .required('Age is required')
-    .integer('Age must be a whole number')
-    .min(1, 'Age must be 1 or older')
-    .max(120, 'Age is unrealistic'),
+    .typeError("Age must be a number")
+    .required("Age is required")
+    .min(1, "Age must be greater than 0")
+    .max(120, "Age must be realistic (below 120)"),
+  mobile: Yup.string()
+    .required("Mobile number is required")
+    .matches(/^\+?[0-9\s-]{10,15}$/, "Enter a valid mobile number"),
 
+  // === Location Logic ===
+  fromIndia: Yup.string().required("Please select if you are from India"),
+  state: Yup.string().when("fromIndia", {
+    is: "Yes",
+    then: (schema) => schema.required("Please select your state"),
+    otherwise: (schema) => schema.nullable(),
+  }),
+  country: Yup.string().when("fromIndia", {
+    is: "No",
+    then: (schema) =>
+      schema
+        .trim()
+        .required("Please enter your country")
+        .min(2, "Country name seems too short"),
+    otherwise: (schema) => schema.nullable(),
+  }),
+
+  // === Health Info ===
   bodyWeight: Yup.number()
-    .typeError('Body Weight must be a number')
-    .required('Body Weight is required')
-    .min(1, 'Weight must be positive')
-    .max(500, 'Weight is too high'),
-
+    .typeError("Body weight must be a number")
+    .required("Please enter your body weight")
+    .min(1, "Weight must be realistic")
+    .max(300, "Weight must be realistic")
+    .required('Body weight is required'),
   vitiligoDuration: Yup.number()
-    .typeError('Duration must be a number')
-    .required('Duration is required')
-    .min(1, 'Duration must be positive'),
+    .typeError("Duration must be a number")
+    .required("Please enter vitiligo duration")
+    .min(0, "Duration cannot be negative")
+    .max(100, "Duration seems too long"),
 
-  currentMedicine: Yup.string()
-    .required('Please indicate if you are taking medicine'),
+  currentMedicine: Yup.string().required("Please specify if you take medicine"),
+  familyHistory: Yup.string().required("Please specify family history"),
+  covidVaccine: Yup.string().required("Please specify your COVID vaccination status"),
 
-  familyHistory: Yup.string()
-    .required('Please indicate family history status'),
+  // === Conditional Vaccine Doses ===
+  vaccineDoses: Yup.string().when("covidVaccine", {
+    is: (val) => val && val.toLowerCase() === "yes",
+    then: (schema) => schema.required("Please select number of doses"),
+    otherwise: (schema) => schema.nullable(),
+  }),
 
-  covidVaccine: Yup.string()
-    .required('Please indicate COVID vaccine status'),
-
-  vaccineDoses: Yup.string()
-    .when('covidVaccine', {
-      is: 'yes',
-      then: (schema) => schema.required('Number of doses is required if vaccine was taken'),
-      otherwise: (schema) => schema.notRequired(),
-    }),
-  otherDisease: Yup.string()
-    .max(500, 'Details are too long')
-    .notRequired(),
+  // === Other Diseases ===
+  hasDisease: Yup.string().nullable(),
+  diseaseDetails: Yup.string().when("hasDisease", {
+    is: "Yes",
+    then: (schema) =>
+      schema
+        .trim()
+        .max(100, "Please keep it concise (max 100 characters)")
+        .nullable(),
+    otherwise: (schema) => schema.nullable(),
+  }),
 });

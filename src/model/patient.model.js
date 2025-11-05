@@ -14,7 +14,7 @@ export const createNewPatient = async (payload) => {
       data: payload,
       select: {
         id: true,
-        patentId: true,
+        patientId: true,
         name: true,
         createdAt: true,
         status: true

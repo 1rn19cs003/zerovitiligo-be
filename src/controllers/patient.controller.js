@@ -15,43 +15,59 @@ export const getAllPatients = async (req, res, next) => {
 export const createPatient = async (req, res, next) => {
     try {
 
-        const validationErrors = await patientValidationSchema.validate(req.body, { abortEarly: true });
-        if (validationErrors.errors) {
+        const validationResult = await patientValidationSchema.validate(req.body, { abortEarly: true });
+        if (validationResult.errors) {
             return res.status(400).json({
-                data: validationErrors.errors
+                data: validationResult.errors
             })
         }
         const {
             name,
             age,
             bodyWeight,
-            address,
             vitiligoDuration,
             currentMedicine,
             covidVaccine,
             vaccineDoses,
-            otherDisease,
-            familyHistory
+            familyHistory,
+            fromIndia,
+            state,
+            country,
+            hasDisease,
+            diseaseDetails,
         } = req.body;
+
+        let address = "";
+        if (fromIndia === "Yes") {
+            address = state ? `India, ${state}` : "India";
+        } else if (fromIndia === "No") {
+            address = country || null;
+        }
+
+        // Prepare data to save
         const dataToSave = {
-            patentId: generatePatientId(),
+            patientId: generatePatientId(),
             name: name,
             age: parseInt(age),
-            address: address || null,
-            vitiligoDuration: vitiligoDuration.toString() + ' Years',
+            address: address,
+            vitiligoDuration: vitiligoDuration.toString() + " Years",
             currentMedicine: currentMedicine,
             familyHistory: familyHistory,
             covidVaccine: covidVaccine,
-            otherDisease: otherDisease || null,
+            fromIndia: fromIndia,
+            hasDisease: hasDisease === "Yes" ? hasDisease : "No",
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
-            vaccineDoses: (covidVaccine === 'yes' && vaccineDoses)
-                ? parseInt(vaccineDoses.split(' ')[0])
-                : null,
+            diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,
+            vaccineDoses:
+                covidVaccine === "yes" && vaccineDoses
+                    ? vaccineDoses
+                    : null,
         };
+
+        // Save data to db
         const response = await createNewPatient(dataToSave);
-        return res.status(200).json({
-            data: response
-        })
+        return res.status(200).json({ data: response });
+
     } catch (error) {
         if (error.code === 'P2002') {
             return res.status(409).json({

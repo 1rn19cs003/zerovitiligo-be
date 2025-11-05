@@ -34,26 +34,37 @@ model Assistant {
 }
 
 model Patient {
-  id               String           @id @default(uuid())
-  patentId         String           @unique
-  name             String
-  age              Int
-  bodyWeight       Float?
-  address          String?
+  id         String  @id @default(uuid())
+  patientId  String  @unique
+  name       String
+  age        Int
+  bodyWeight Float?
+  address    String?
+
+  fromIndia String?
+  state     String?
+  country   String?
+
   vitiligoDuration String?
   currentMedicine  String?
   covidVaccine     String?
   vaccineDoses     Int?
-  otherDisease     String?
-  familyHistory    String?
-  status           Status           @default(INITIAL)
-  doctorId         String?
-  assistantId      String?
-  createdAt        DateTime         @default(now())
-  images           Image[]
-  assistant        Assistant?       @relation(fields: [assistantId], references: [id])
-  doctor           Doctor?          @relation(fields: [doctorId], references: [id])
-  histories        PatientHistory[]
+
+  // Disease-related fields updated
+  hasDisease     String?
+  diseaseDetails String?
+
+  familyHistory String?
+  status        Status   @default(NEW_REGISTRATION)
+  doctorId      String?
+  assistantId   String?
+  createdAt     DateTime @default(now())
+
+  // Relations
+  images    Image[]
+  assistant Assistant?       @relation(fields: [assistantId], references: [id])
+  doctor    Doctor?          @relation(fields: [doctorId], references: [id])
+  histories PatientHistory[]
 }
 
 model Image {
@@ -85,7 +96,9 @@ enum DoctorRole {
 }
 
 enum Status {
-  INITIAL
-  PROCESSING
-  TREATED
+  NEW_REGISTRATION // Patient just registered, no doctor assigned yet
+  UNDER_DIAGNOSIS // Doctor/assistant is inspecting or evaluating
+  UNDER_TREATMENT // Actively receiving treatment
+  TREATMENT_COMPLETED // Treatment completed, patient recovered or discharged
+  FOLLOW_UP // Under observation or periodic review
 }
