@@ -4,9 +4,17 @@ import { generatePatientId, patientValidationSchema } from "./Utils/patient.util
 export const getAllPatients = async (req, res, next) => {
     try {
         const response = await getAllPatientsData();
-        return res.status(200).json({
-            data: response
-        })
+        const formattedResponse = response.map(data => ({
+            id: data.patientId || 'N/A',
+            name: data.name || 'N/A',
+            age: data.age || 'N/A',
+            mobile: data.mobile || 'N/A',
+            address: data.address || 'N/A',
+            state: data.state || 'N/A',
+            status: data.status || 'N/A'
+        }));
+
+        return res.status(200).json({ data: formattedResponse });
     } catch (error) {
         next(error);
     }
@@ -31,32 +39,23 @@ export const createPatient = async (req, res, next) => {
             covidVaccine,
             vaccineDoses,
             familyHistory,
-            fromIndia,
             state,
-            country,
             hasDisease,
             diseaseDetails,
         } = req.body;
 
-        let address = "";
-        if (fromIndia === "Yes") {
-            address = state ? `India, ${state}` : "India";
-        } else if (fromIndia === "No") {
-            address = country || null;
-        }
 
         // Prepare data to save
         const dataToSave = {
             patientId: generatePatientId(),
             name: name,
             age: parseInt(age),
-            address: address,
+            state: state,
             mobile: mobile,
             vitiligoDuration: vitiligoDuration.toString() + " Years",
             currentMedicine: currentMedicine,
             familyHistory: familyHistory,
             covidVaccine: covidVaccine,
-            fromIndia: fromIndia,
             hasDisease: hasDisease === "Yes" ? hasDisease : "No",
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
             diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,

@@ -42,9 +42,7 @@ model Patient {
   bodyWeight Float?
   address    String?
 
-  fromIndia String?
   state     String?
-  country   String?
 
   vitiligoDuration String?
   currentMedicine  String?
