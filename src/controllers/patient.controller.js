@@ -4,9 +4,17 @@ import { generatePatientId, patientValidationSchema } from "./Utils/patient.util
 export const getAllPatients = async (req, res, next) => {
     try {
         const response = await getAllPatientsData();
-        return res.status(200).json({
-            data: response
-        })
+        const formattedResponse = response.map(data => ({
+            id: data.patientId || 'N/A',
+            name: data.name || 'N/A',
+            age: data.age || 'N/A',
+            mobile: data.mobile || 'N/A',
+            address: data.address || 'N/A',
+            state: data.state || 'N/A',
+            status: data.status || 'N/A'
+        }));
+
+        return res.status(200).json({ data: formattedResponse });
     } catch (error) {
         next(error);
     }
