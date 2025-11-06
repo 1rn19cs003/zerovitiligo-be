@@ -31,32 +31,23 @@ export const createPatient = async (req, res, next) => {
             covidVaccine,
             vaccineDoses,
             familyHistory,
-            fromIndia,
             state,
-            country,
             hasDisease,
             diseaseDetails,
         } = req.body;
 
-        let address = "";
-        if (fromIndia === "Yes") {
-            address = state ? `India, ${state}` : "India";
-        } else if (fromIndia === "No") {
-            address = country || null;
-        }
 
         // Prepare data to save
         const dataToSave = {
             patientId: generatePatientId(),
             name: name,
             age: parseInt(age),
-            address: address,
+            state: state,
             mobile: mobile,
             vitiligoDuration: vitiligoDuration.toString() + " Years",
             currentMedicine: currentMedicine,
             familyHistory: familyHistory,
             covidVaccine: covidVaccine,
-            fromIndia: fromIndia,
             hasDisease: hasDisease === "Yes" ? hasDisease : "No",
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
             diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,
