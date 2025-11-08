@@ -4,9 +4,45 @@ import cors from 'cors';
 import router from './src/routes/index.js';
 import errorMiddleware from './src/middleware/error.js';
 import prisma from './prisma.setup.js';
+import http from 'http';
+import WebSocket, { WebSocketServer } from 'ws';
 
 const app = express();
 const port = process.env.PORT || 8000
+
+
+const server = http.createServer();
+const wss = new WebSocketServer({ server });
+
+let visitorCount = 0;
+
+wss.on('connection', (ws) => {
+    visitorCount++;
+    broadcastVisitorCount();
+
+    ws.on('close', () => {
+        // Decrement when client disconnects
+        // visitorCount--;
+        broadcastVisitorCount();
+    });
+
+    ws.on('error', () => {
+        visitorCount--;
+        broadcastVisitorCount();
+    });
+});
+
+export const broadcastVisitorCount = () => {
+    const message = JSON.stringify({ visitorCount });
+
+    wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+            client.send(message);
+        }
+    });
+}
+
+
 
 app.use(express.json())
 
@@ -95,6 +131,6 @@ app.use('/api', router);
 
 app.use(errorMiddleware);
 
-app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`)
-})
+server.listen(port, () => {
+  console.log(`Server (HTTP + WS) running on http://localhost:${port}`);
+});
