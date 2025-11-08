@@ -1,7 +1,9 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { createNewDoctor, getDoctorByCreds } from "../model/doctoer.model.js";
 
+const JWT_SECRET = process.env.JWT_SECRET
 export const createDoctor = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
@@ -44,11 +46,24 @@ export const doctorLogin = async (req, res, next) => {
             return res.status(401).json({ message: "Invalid credentials." });
         }
 
+        const token = jwt.sign(
+            {
+                id: doctor.id,
+                email: doctor.email,
+                role: doctor.role,
+            },
+            JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+
         return res.status(200).json({
-            id: doctor.id,
-            name: doctor.name,
-            email: doctor.email,
-            role: doctor.role
+            token,
+            user: {
+                id: doctor.id,
+                name: doctor.name,
+                email: doctor.email,
+                role: doctor.role
+            }
         });
     } catch (error) {
         next(error);
