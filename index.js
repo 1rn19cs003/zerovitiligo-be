@@ -22,7 +22,7 @@ wss.on('connection', (ws) => {
 
     ws.on('close', () => {
         // Decrement when client disconnects
-        visitorCount--;
+        // visitorCount--;
         broadcastVisitorCount();
     });
 
