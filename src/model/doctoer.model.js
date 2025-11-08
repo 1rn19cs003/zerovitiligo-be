@@ -30,3 +30,39 @@ export const getDoctorByCreds = async (payload) => {
         throw err;
     }
 };
+
+export const getDoctorById = async (userId) => {
+    try {
+        return await prisma.doctor.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
+export const updateDoctorById = async (payload) => {
+    try {
+        return await prisma.doctor.update({
+            where: { id: payload.userId },
+            data: { email: payload.email },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+            },
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
