@@ -74,7 +74,6 @@ export const doctorLogin = async (req, res, next) => {
 export const getProfile = async (req, res, next) => {
     try {
         const userId = req.user?.id; // assuming authentication middleware sets req.user
-
         if (!userId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
