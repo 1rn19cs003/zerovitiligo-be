@@ -8,6 +8,19 @@ export const getAllPatientsData = async () => {
   }
 };
 
+
+export const getPatientDataWithId=async(id)=>{
+  try {
+    return await prisma.patient.findUnique({
+      where:{
+        id:id
+      }
+    })
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const createNewPatient = async (payload) => {
   try {
     return await prisma.patient.create({
