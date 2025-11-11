@@ -9,12 +9,24 @@ export const getAllPatientsData = async () => {
 };
 
 
-export const getPatientDataWithId=async(id)=>{
+export const getPatientDataWithId = async (id) => {
   try {
     return await prisma.patient.findUnique({
-      where:{
-        patientId:id
+      where: {
+        patientId: id
       }
+    })
+  } catch (error) {
+    throw error;
+  }
+}
+export const updatePatientWithID = async (id, payload) => {
+  try {
+    return await prisma.patient.update({
+      where: {
+        patientId: id
+      },
+      data: payload
     })
   } catch (error) {
     throw error;
@@ -34,7 +46,7 @@ export const createNewPatient = async (payload) => {
       }
     });
   } catch (err) {
-    console.log({eoor:err})
+    console.log({ eoor: err })
     throw err;
   }
 };

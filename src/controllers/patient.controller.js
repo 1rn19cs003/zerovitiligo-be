@@ -1,4 +1,4 @@
-import { createNewPatient, getAllPatientsData, getPatientDataWithId } from "../model/patient.model.js";
+import { createNewPatient, getAllPatientsData, getPatientDataWithId, updatePatientWithID } from "../model/patient.model.js";
 import { generatePatientId, patientValidationSchema } from "./Utils/patient.utils.js";
 
 export const getAllPatients = async (req, res, next) => {
@@ -33,6 +33,28 @@ export const getPatient = async (req, res, next) => {
         return res.status(200).json({
             success: true,
             data: patient,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+export const updatePatient = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const existingPatient = await getPatientDataWithId(id);
+        if (!existingPatient) {
+            return res.status(404).json({
+                success: false,
+                message: 'Patient not found',
+            });
+        }
+
+        const updateData = req.body;
+        const updatedPatient = await updatePatientWithID(id, updateData);
+        return res.status(200).json({
+            success: true,
+            data: updatedPatient,
+            message: 'Patient updated successfully',
         });
     } catch (error) {
         next(error);
