@@ -13,7 +13,7 @@ export const getPatientDataWithId=async(id)=>{
   try {
     return await prisma.patient.findUnique({
       where:{
-        id:id
+        patientId:id
       }
     })
   } catch (error) {
