@@ -56,14 +56,7 @@ export const patientValidationSchema = Yup.object({
 
   currentMedicine: Yup.string().required("Please specify if you take medicine"),
   familyHistory: Yup.string().required("Please specify family history"),
-  covidVaccine: Yup.string().required("Please specify your COVID vaccination status"),
-
-  // === Conditional Vaccine Doses ===
-  vaccineDoses: Yup.string().when("covidVaccine", {
-    is: (val) => val && val.toLowerCase() === "yes",
-    then: (schema) => schema.required("Please select number of doses"),
-    otherwise: (schema) => schema.nullable(),
-  }),
+  vaccineDoses: Yup.string().required("Please select number of doses"),
 
   // === Other Diseases ===
   hasDisease: Yup.string().nullable(),
