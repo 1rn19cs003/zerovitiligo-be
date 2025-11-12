@@ -1,4 +1,4 @@
-import prisma from '../../prisma.setup.js'
+
 
 export const getAllPatientsData = async () => {
   try {
