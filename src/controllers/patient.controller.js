@@ -49,7 +49,38 @@ export const updatePatient = async (req, res, next) => {
             });
         }
 
-        const updateData = req.body;
+        const {
+            name,
+            age,
+            mobile,
+            bodyWeight,
+            address,
+            state,
+            vitiligoDuration,
+            currentMedicine,
+            vaccineDoses,
+            hasDisease,
+            diseaseDetails,
+            familyHistory,
+            status,
+        } = req.body;
+
+        const updateData = {
+            name,
+            age: parseInt(age),
+            bodyWeight:parseFloat(bodyWeight),
+            address,
+            mobile,
+            state,
+            vitiligoDuration,
+            currentMedicine,
+            vaccineDoses,
+            hasDisease,
+            diseaseDetails,
+            familyHistory,
+            status,
+        }
+
         const updatedPatient = await updatePatientWithID(id, updateData);
         return res.status(200).json({
             success: true,
