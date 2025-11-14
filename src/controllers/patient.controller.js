@@ -77,7 +77,6 @@ export const createPatient = async (req, res, next) => {
             mobile,
             vitiligoDuration,
             currentMedicine,
-            covidVaccine,
             vaccineDoses,
             familyHistory,
             state,
@@ -96,14 +95,10 @@ export const createPatient = async (req, res, next) => {
             vitiligoDuration: vitiligoDuration.toString() + " Years",
             currentMedicine: currentMedicine,
             familyHistory: familyHistory,
-            covidVaccine: covidVaccine,
             hasDisease: hasDisease === "Yes" ? hasDisease : "No",
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
             diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,
-            vaccineDoses:
-                covidVaccine === "yes" && vaccineDoses
-                    ? vaccineDoses
-                    : null,
+            vaccineDoses: vaccineDoses
         };
 
         // Save data to db

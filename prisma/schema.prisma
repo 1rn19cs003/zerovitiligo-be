@@ -19,6 +19,8 @@ model Doctor {
   assistants     Assistant[]      @relation("DoctorAssistants")
   patients       Patient[]
   PatientHistory PatientHistory[]
+
+  Appointment Appointment[]
 }
 
 model Assistant {
@@ -42,11 +44,10 @@ model Patient {
   bodyWeight Float?
   address    String?
 
-  state     String?
+  state String?
 
   vitiligoDuration String?
   currentMedicine  String?
-  covidVaccine     String?
   vaccineDoses     Int?
 
   // Disease-related fields updated
@@ -64,6 +65,8 @@ model Patient {
   assistant Assistant?       @relation(fields: [assistantId], references: [id])
   doctor    Doctor?          @relation(fields: [doctorId], references: [id])
   histories PatientHistory[]
+
+  Appointment Appointment[]
 }
 
 model Image {
@@ -87,6 +90,33 @@ model PatientHistory {
   assistant      Assistant? @relation(fields: [assistantId], references: [id])
   doctor         Doctor?    @relation(fields: [doctorId], references: [id])
   patient        Patient    @relation(fields: [patientId], references: [id])
+}
+
+model Appointment {
+  id              String            @id @default(uuid())
+  doctorId        String
+  patientId       String
+  appointmentDate DateTime
+  startTime       DateTime
+  endTime         DateTime?
+  reason          String?
+  medication      String?
+  status          AppointmentStatus @default(SCHEDULED)
+  notes           String?
+
+  // Relations
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+  patient Patient @relation(fields: [patientId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum AppointmentStatus {
+  SCHEDULED
+  COMPLETED
+  CANCELLED
+  MISSED
 }
 
 enum DoctorRole {
