@@ -10,6 +10,8 @@ export const createAppointment = async (req, res, next) => {
             endTime,
             reason,
             medication,
+            status,
+            notes,
         } = req.body;
 
         const reqObj = {
@@ -20,6 +22,8 @@ export const createAppointment = async (req, res, next) => {
             endTime: endTime ? new Date(endTime) : null,
             reason: reason || '',
             medication: medication || '',
+            status,
+            notes,
         };
 
         const appResponse = await newAppointment(reqObj);
