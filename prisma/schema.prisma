@@ -48,7 +48,7 @@ model Patient {
 
   vitiligoDuration String?
   currentMedicine  String?
-  vaccineDoses     Int?
+  vaccineDoses     String?
 
   // Disease-related fields updated
   hasDisease     String?
