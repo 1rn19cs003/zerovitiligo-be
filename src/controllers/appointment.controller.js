@@ -1,4 +1,4 @@
-import { getAppointments, newAppointment } from "../model/appointment.model.js";
+import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment } from "../model/appointment.model.js";
 
 export const createAppointment = async (req, res, next) => {
     try {
@@ -36,7 +36,6 @@ export const createAppointment = async (req, res, next) => {
 export const getAppointmentsByDoctor = async (req, res, next) => {
     try {
         const { doctorId } = req.query;
-        console.log({ doctorId })
         if (!doctorId) {
             return res.status(400).json({
                 success: false,
@@ -44,7 +43,25 @@ export const getAppointmentsByDoctor = async (req, res, next) => {
             });
         }
 
-        const appointments = await getAppointments(doctorId);
+        const appointments = await getAppointmentsByDoc(doctorId);
+
+        return res.status(200).json({ success: true, data: appointments });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const getAppointmentsByPatient = async (req, res, next) => {
+    try {
+        const { patientId } = req.query;
+        if (!patientId) {
+            return res.status(400).json({
+                success: false,
+                message: 'patient query parameter is required',
+            });
+        }
+
+        const appointments = await getAppointmentsByPat(patientId);
 
         return res.status(200).json({ success: true, data: appointments });
     } catch (error) {

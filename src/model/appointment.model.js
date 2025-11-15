@@ -12,11 +12,25 @@ export const newAppointment = async (payload) => {
     }
 };
 
-export const getAppointments = async (id) => {
+export const getAppointmentsByDoc = async (id) => {
     try {
         return await prisma.appointment.findMany({
             where: { doctorId: id },
             include: { patient: true }
+        });
+    } catch (err) {
+        console.log({ eoor: err })
+        throw err;
+    }
+};
+export const getAppointmentsByPat = async (id) => {
+    try {
+        return await prisma.appointment.findMany({
+            where: {
+                patient: {
+                    patientId: id
+                }
+            },
         });
     } catch (err) {
         console.log({ eoor: err })
