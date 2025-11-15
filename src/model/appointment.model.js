@@ -23,17 +23,23 @@ export const getAppointmentsByDoc = async (id) => {
         throw err;
     }
 };
-export const getAppointmentsByPat = async (id) => {
+
+export const getAppointmentsByPat = async ({ patientId, Id, appointmentStatus }) => {
     try {
-        return await prisma.appointment.findMany({
-            where: {
-                patient: {
-                    patientId: id
-                }
-            },
-        });
+        const where = {};
+        if (patientId) {
+            where.patient = { patientId };
+        }
+        if (Id) {
+            where.patientId = Id;
+        }
+        if (appointmentStatus) {
+            where.status = appointmentStatus;
+        }
+        return await prisma.appointment.findMany({ where });
     } catch (err) {
-        console.log({ eoor: err })
+        console.log({ error: err });
         throw err;
     }
 };
+

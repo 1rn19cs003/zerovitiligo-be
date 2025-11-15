@@ -1,3 +1,4 @@
+import { AppointmentStatus } from "../../generated/prisma/index.js";
 import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment } from "../model/appointment.model.js";
 
 export const createAppointment = async (req, res, next) => {
@@ -13,6 +14,14 @@ export const createAppointment = async (req, res, next) => {
             status,
             notes,
         } = req.body;
+
+        const scheduledAppointments = await getAppointmentsByPat({ patientId: undefined, Id: patientId, appointmentStatus: AppointmentStatus.SCHEDULED });
+        if (scheduledAppointments && scheduledAppointments.length > 0) {
+            return res.status(400).json({
+                success: true,
+                message: 'Patient already has a scheduled appointment. Please complete or cancel existing appointment before creating a new one.',
+            });
+        }
 
         const reqObj = {
             doctorId,
