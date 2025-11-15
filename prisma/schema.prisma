@@ -130,4 +130,5 @@ enum Status {
   UNDER_TREATMENT // Actively receiving treatment
   TREATMENT_COMPLETED // Treatment completed, patient recovered or discharged
   FOLLOW_UP // Under observation or periodic review
+  BLOCKED // Under observation or periodic review
 }

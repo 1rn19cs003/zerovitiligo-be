@@ -12,7 +12,7 @@ export const newAppointment = async (payload) => {
     }
 };
 
-export const getAppointments = async (id) => {
+export const getAppointmentsByDoc = async (id) => {
     try {
         return await prisma.appointment.findMany({
             where: { doctorId: id },
@@ -23,3 +23,35 @@ export const getAppointments = async (id) => {
         throw err;
     }
 };
+
+export const getAppointmentsByPat = async ({ patientId, Id, appointmentStatus }) => {
+    try {
+        const where = {};
+        if (patientId) {
+            where.patient = { patientId: patientId };
+        }
+        if (Id) {
+            where.patientId = Id;
+        }
+        if (appointmentStatus) {
+            where.status = appointmentStatus;
+        }
+        return await prisma.appointment.findMany({ where });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
+export const updateAppointment = async (appointmentId, payload) => {
+    try {
+        return await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: payload
+        })
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+}
+
