@@ -11,7 +11,8 @@ export const getAllPatients = async (req, res, next) => {
             mobile: data.mobile || 'N/A',
             address: data.address || 'N/A',
             state: data.state || 'N/A',
-            status: data.status || 'N/A'
+            status: data.status || 'N/A',
+            createdAt: data.createdAt || 'N/A'
         }));
 
         return res.status(200).json({ data: formattedResponse });
