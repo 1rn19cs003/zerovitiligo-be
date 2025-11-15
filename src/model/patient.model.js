@@ -14,12 +14,20 @@ export const getPatientDataWithId = async (id) => {
     return await prisma.patient.findUnique({
       where: {
         patientId: id
+      },
+      include: {
+        Appointment: {
+          select: {
+            status: true
+          }
+        }
       }
     })
   } catch (error) {
     throw error;
   }
 }
+
 export const updatePatientWithID = async (id, payload) => {
   try {
     return await prisma.patient.update({
