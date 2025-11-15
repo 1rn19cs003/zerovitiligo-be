@@ -1,5 +1,5 @@
 import { AppointmentStatus } from "../../generated/prisma/index.js";
-import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment } from "../model/appointment.model.js";
+import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment, updateAppointment } from "../model/appointment.model.js";
 
 export const createAppointment = async (req, res, next) => {
     try {
@@ -48,7 +48,7 @@ export const getAppointmentsByDoctor = async (req, res, next) => {
         if (!doctorId) {
             return res.status(400).json({
                 success: false,
-                message: 'doctorId query parameter is required',
+                message: 'doctorId is required',
             });
         }
 
@@ -66,7 +66,7 @@ export const getAppointmentsByPatient = async (req, res, next) => {
         if (!patientId) {
             return res.status(400).json({
                 success: false,
-                message: 'patient query parameter is required',
+                message: 'patientId is required',
             });
         }
         const appointments = await getAppointmentsByPat({
@@ -79,3 +79,34 @@ export const getAppointmentsByPatient = async (req, res, next) => {
         next(error);
     }
 };
+
+export const updateAppointmentByAppointmentId = async (req, res, next) => {
+    try {
+        const { appointmentId } = req.query;
+        if (!appointmentId) {
+            return res.status(400).json({
+                success: false,
+                message: 'appointmentId is required',
+            });
+        }
+
+        const {
+            reason,
+            medication,
+            status,
+            notes,
+        } = req.body;
+
+        const payload = {
+            reason,
+            medication,
+            status,
+            notes,
+        };
+        const updatedAppomintment = await updateAppointment(appointmentId, payload)
+        return res.status(200).json({ success: true, data: updatedAppomintment });
+
+    } catch (error) {
+        next(error);
+    }
+}

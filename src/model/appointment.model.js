@@ -43,3 +43,15 @@ export const getAppointmentsByPat = async ({ patientId, Id, appointmentStatus })
     }
 };
 
+export const updateAppointment = async (appointmentId, payload) => {
+    try {
+        return await prisma.appointment.update({
+            where: { id: appointmentId },
+            data: payload
+        })
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+}
+
