@@ -69,9 +69,11 @@ export const getAppointmentsByPatient = async (req, res, next) => {
                 message: 'patient query parameter is required',
             });
         }
-
-        const appointments = await getAppointmentsByPat(patientId);
-
+        const appointments = await getAppointmentsByPat({
+            patientId,
+            Id: undefined,
+            appointmentStatus: undefined
+        });
         return res.status(200).json({ success: true, data: appointments });
     } catch (error) {
         next(error);

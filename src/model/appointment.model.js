@@ -28,7 +28,7 @@ export const getAppointmentsByPat = async ({ patientId, Id, appointmentStatus })
     try {
         const where = {};
         if (patientId) {
-            where.patient = { patientId };
+            where.patient = { patientId: patientId };
         }
         if (Id) {
             where.patientId = Id;
