@@ -1,7 +1,7 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { createNewDoctor, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
+import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
 
 const JWT_SECRET = process.env.JWT_SECRET
 export const createDoctor = async (req, res, next) => {
@@ -113,3 +113,18 @@ export const updateProfile = async (req, res, next) => {
     }
 };
 
+export const getAllDoctors = async (req, res, next) => {
+    try {
+        const response = await getAllDocData()
+        if (!response) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};

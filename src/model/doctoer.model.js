@@ -66,3 +66,19 @@ export const updateDoctorById = async (payload) => {
     }
 };
 
+export const getAllDocData = async () => {
+    try {
+        return await prisma.doctor.findMany({
+            select: {
+                name: true,
+                email: true,
+                createdAt: true,
+                role: true
+            }
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
