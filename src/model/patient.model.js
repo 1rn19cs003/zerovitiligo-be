@@ -1,8 +1,22 @@
+import { AppointmentStatus } from "../../generated/prisma/index.js";
 import prisma from '../../prisma.setup.js'
 
 export const getAllPatientsData = async () => {
   try {
-    return await prisma.patient.findMany();
+    return await prisma.patient.findMany({
+      include: {
+        Appointment: {
+          where: {
+            status: AppointmentStatus.SCHEDULED,
+          },
+          select: {
+            status:true,
+            createdAt: true,
+            appointmentDate: true,
+          }
+        }
+      }
+    });
   } catch (err) {
     throw err;
   }
