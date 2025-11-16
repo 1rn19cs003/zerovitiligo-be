@@ -48,16 +48,17 @@ export const getDoctorById = async (userId) => {
     }
 };
 
-export const updateDoctorById = async (payload) => {
+export const updateDoctorById = async (userId, email, payload) => {
     try {
         return await prisma.doctor.update({
-            where: { id: payload.userId },
-            data: { email: payload.email },
+            where: { id: userId, email: email },
+            data: payload,
             select: {
                 id: true,
                 name: true,
                 email: true,
                 role: true,
+                mobile: true,
             },
         });
     } catch (err) {

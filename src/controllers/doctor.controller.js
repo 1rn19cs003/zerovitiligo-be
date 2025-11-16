@@ -73,7 +73,7 @@ export const doctorLogin = async (req, res, next) => {
 // Fetch profile for authenticated user
 export const getProfile = async (req, res, next) => {
     try {
-        const userId = req.user?.id; // assuming authentication middleware sets req.user
+        const userId = req.user?.id;
         if (!userId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
@@ -100,14 +100,12 @@ export const updateProfile = async (req, res, next) => {
         const { email, phone } = req.body;
 
         const userObj = {
-            userId: userId,
-            email: email,
             phone: phone
         }
 
-        const response = await updateDoctorById(userObj)
+        const response = await updateDoctorById(userId,email, userObj)
 
-        return res.status(200).json({ user: response });
+        return res.status(200).json({ success: true, data: response });
     } catch (error) {
         next(error);
     }
