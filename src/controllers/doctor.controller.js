@@ -100,7 +100,7 @@ export const updateProfile = async (req, res, next) => {
         const { email, phone } = req.body;
 
         const userObj = {
-            phone: phone
+            mobile: phone
         }
 
         const response = await updateDoctorById(userId,email, userObj)

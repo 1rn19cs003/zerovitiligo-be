@@ -40,6 +40,7 @@ export const getDoctorById = async (userId) => {
                 name: true,
                 email: true,
                 role: true,
+                mobile: true,
             },
         });
     } catch (err) {
