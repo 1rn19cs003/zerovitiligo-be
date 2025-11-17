@@ -89,7 +89,7 @@ function generatePatientData(count) {
             hasDisease: "No",
             diseaseDetails: "",
             familyHistory: "None",
-            status: "UNDER_DIAGNOSIS",
+            status: "UNDER_TREATMENT",
             doctorId: null,
             assistantId: null,
         },
@@ -152,7 +152,7 @@ function generatePatientData(count) {
 
     // Repeat or slice array based on requested count
     const result = [];
-    for (let i = 0; i < count; i++) {
+    for (let i = 60; i < count; i++) {
         const base = basePatients[i % basePatients.length];
         // Generate unique patientId and mobile by appending index
         result.push({
@@ -182,7 +182,7 @@ async function seedPatients(count) {
 
 // Main seed function
 async function main() {
-    await seedPatients(20);       // Seed 10 patient rows
+    await seedPatients(90);       // Seed 10 patient rows
     //   await seedOtherTable(5);      // Example: seed 5 rows for other table
 }
 
