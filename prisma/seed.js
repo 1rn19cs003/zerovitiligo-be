@@ -1,5 +1,5 @@
 import prisma from '../prisma.setup.js';
-
+import bcrypt from 'bcryptjs';
 // Utility to generate dummy patient data
 function generatePatientData(count) {
     const basePatients = [
@@ -48,16 +48,38 @@ async function seedPatients(count) {
     console.log(`Seeded ${count} patients.`);
 }
 
-// Placeholder function for another table
-// async function seedOtherTable(count) {
-//   // TODO: adjust for your other models
-//   console.log(`Seeding other table with ${count} rows - implement as needed.`);
+// Assuming you have a Doctor model in Prisma schema like:
+// model Doctor {
+//   id         Int    @id @default(autoincrement())
+//   doctorId   String @unique
+//   name       String
+//   email      String @unique
+//   role       String
+//   createdAt  DateTime @default(now())
 // }
+
+// Example seed function for Admin doctors
+async function seedDoctorTableWithADMIN() {
+    const admins = [
+        {
+            name: 'Admin User One',
+            email: 'admin@gmail.com',
+            role: 'ADMIN',
+            password:await bcrypt.hash('admin', 10),
+        }
+    ];
+
+    await prisma.doctor.createMany({
+        data: admins,
+        skipDuplicates: true, // skips duplicates to avoid errors on reruns
+    });
+    console.log(`Seeded ${admins.length} admin doctors.`);
+}
 
 // Main seed function
 async function main() {
-    await seedPatients(90);       // Seed 10 patient rows
-    //   await seedOtherTable(5);      // Example: seed 5 rows for other table
+    // await seedPatients(90);       // Seed 10 patient rows
+    await seedDoctorTableWithADMIN();   // Example: seed 5 rows for other table
 }
 
 main()
