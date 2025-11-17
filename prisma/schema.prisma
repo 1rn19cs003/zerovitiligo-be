@@ -15,24 +15,11 @@ model Doctor {
   email          String           @unique
   password       String
   role           DoctorRole       @default(ASSISTANT)
+  mobile         String?
   createdAt      DateTime         @default(now())
-  assistants     Assistant[]      @relation("DoctorAssistants")
   patients       Patient[]
-  PatientHistory PatientHistory[]
 
   Appointment Appointment[]
-}
-
-model Assistant {
-  id             String           @id @default(uuid())
-  name           String
-  email          String           @unique
-  password       String
-  doctorId       String
-  createdAt      DateTime         @default(now())
-  doctor         Doctor           @relation("DoctorAssistants", fields: [doctorId], references: [id])
-  patients       Patient[]
-  PatientHistory PatientHistory[]
 }
 
 model Patient {
@@ -62,9 +49,7 @@ model Patient {
 
   // Relations
   images    Image[]
-  assistant Assistant?       @relation(fields: [assistantId], references: [id])
   doctor    Doctor?          @relation(fields: [doctorId], references: [id])
-  histories PatientHistory[]
 
   Appointment Appointment[]
 }
@@ -75,21 +60,6 @@ model Image {
   patientId  String
   uploadedAt DateTime @default(now())
   patient    Patient  @relation(fields: [patientId], references: [id])
-}
-
-model PatientHistory {
-  id             String     @id @default(uuid())
-  patientId      String
-  doctorId       String?
-  assistantId    String?
-  lastMedicine   String?
-  adviceGiven    String?
-  lastInspection DateTime
-  nextInspection DateTime?
-  createdAt      DateTime   @default(now())
-  assistant      Assistant? @relation(fields: [assistantId], references: [id])
-  doctor         Doctor?    @relation(fields: [doctorId], references: [id])
-  patient        Patient    @relation(fields: [patientId], references: [id])
 }
 
 model Appointment {

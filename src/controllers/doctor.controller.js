@@ -1,7 +1,7 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { createNewDoctor, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
+import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
 
 const JWT_SECRET = process.env.JWT_SECRET
 export const createDoctor = async (req, res, next) => {
@@ -73,7 +73,7 @@ export const doctorLogin = async (req, res, next) => {
 // Fetch profile for authenticated user
 export const getProfile = async (req, res, next) => {
     try {
-        const userId = req.user?.id; // assuming authentication middleware sets req.user
+        const userId = req.user?.id;
         if (!userId) {
             return res.status(401).json({ error: 'Unauthorized' });
         }
@@ -100,16 +100,29 @@ export const updateProfile = async (req, res, next) => {
         const { email, phone } = req.body;
 
         const userObj = {
-            userId: userId,
-            email: email,
-            phone: phone
+            mobile: phone
         }
 
-        const response = await updateDoctorById(userObj)
+        const response = await updateDoctorById(userId,email, userObj)
 
-        return res.status(200).json({ user: response });
+        return res.status(200).json({ success: true, data: response });
     } catch (error) {
         next(error);
     }
 };
 
+export const getAllDoctors = async (req, res, next) => {
+    try {
+        const response = await getAllDocData()
+        if (!response) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json({
+            success: true,
+            data: response
+        });
+    } catch (error) {
+        next(error);
+    }
+};

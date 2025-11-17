@@ -40,6 +40,7 @@ export const getDoctorById = async (userId) => {
                 name: true,
                 email: true,
                 role: true,
+                mobile: true,
             },
         });
     } catch (err) {
@@ -48,17 +49,34 @@ export const getDoctorById = async (userId) => {
     }
 };
 
-export const updateDoctorById = async (payload) => {
+export const updateDoctorById = async (userId, email, payload) => {
     try {
         return await prisma.doctor.update({
-            where: { id: payload.userId },
-            data: { email: payload.email },
+            where: { id: userId, email: email },
+            data: payload,
             select: {
                 id: true,
                 name: true,
                 email: true,
                 role: true,
+                mobile: true,
             },
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
+export const getAllDocData = async () => {
+    try {
+        return await prisma.doctor.findMany({
+            select: {
+                name: true,
+                email: true,
+                createdAt: true,
+                role: true
+            }
         });
     } catch (err) {
         console.log({ error: err });
