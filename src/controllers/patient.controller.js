@@ -13,7 +13,8 @@ export const getAllPatients = async (req, res, next) => {
             state: data.state || 'N/A',
             status: data.status || 'N/A',
             createdAt: data.createdAt || 'N/A',
-            appointment:data.Appointment,
+            appointmentDate: data?.Appointment?.[0]?.appointmentDate,
+            appointmentStatus: data?.Appointment?.[0]?.status,
         }));
 
         return res.status(200).json({ data: formattedResponse });
@@ -70,7 +71,7 @@ export const updatePatient = async (req, res, next) => {
         const updateData = {
             name,
             age: parseInt(age),
-            bodyWeight:parseFloat(bodyWeight),
+            bodyWeight: parseFloat(bodyWeight),
             address,
             mobile,
             state,

@@ -53,7 +53,7 @@ export const doctorLogin = async (req, res, next) => {
                 role: doctor.role,
             },
             JWT_SECRET,
-            { expiresIn: '1h' }
+            { expiresIn: '4h' }
         );
 
         return res.status(200).json({

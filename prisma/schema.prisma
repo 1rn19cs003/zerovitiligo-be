@@ -10,14 +10,14 @@ datasource db {
 }
 
 model Doctor {
-  id             String           @id @default(uuid())
-  name           String
-  email          String           @unique
-  password       String
-  role           DoctorRole       @default(ASSISTANT)
-  mobile         String?
-  createdAt      DateTime         @default(now())
-  patients       Patient[]
+  id        String     @id @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  role      DoctorRole @default(ASSISTANT)
+  mobile    String?
+  createdAt DateTime   @default(now())
+  patients  Patient[]
 
   Appointment Appointment[]
 }
@@ -48,8 +48,8 @@ model Patient {
   createdAt     DateTime @default(now())
 
   // Relations
-  images    Image[]
-  doctor    Doctor?          @relation(fields: [doctorId], references: [id])
+  images Image[]
+  doctor Doctor? @relation(fields: [doctorId], references: [id])
 
   Appointment Appointment[]
 }
@@ -96,9 +96,9 @@ enum DoctorRole {
 
 enum Status {
   NEW_REGISTRATION // Patient just registered, no doctor assigned yet
-  UNDER_DIAGNOSIS // Doctor/assistant is inspecting or evaluating
   UNDER_TREATMENT // Actively receiving treatment
   TREATMENT_COMPLETED // Treatment completed, patient recovered or discharged
+  PAUSE // Treatment completed, patient recovered or discharged
   FOLLOW_UP // Under observation or periodic review
   BLOCKED // Under observation or periodic review
 }
