@@ -90,6 +90,25 @@ export const getProfile = async (req, res, next) => {
     }
 };
 
+export const getProfileById = async (req, res, next) => {
+    try {
+        const { profileId } = req.query;
+        if (!profileId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const response = await getDoctorById(profileId)
+
+        if (!response) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        return res.status(200).json(response);
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const updateProfile = async (req, res, next) => {
     try {
         const userId = req.user?.id;
@@ -103,7 +122,7 @@ export const updateProfile = async (req, res, next) => {
             mobile: phone
         }
 
-        const response = await updateDoctorById(userId,email, userObj)
+        const response = await updateDoctorById(userId, email, userObj)
 
         return res.status(200).json({ success: true, data: response });
     } catch (error) {
