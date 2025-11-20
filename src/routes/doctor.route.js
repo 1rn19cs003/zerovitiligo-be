@@ -9,6 +9,6 @@ router.post('/login', doctorLogin)
 router.get('/profile', authenticateJWT, getProfile);
 router.put('/profile', authenticateJWT, updateProfile);
 router.get('/profileId/', authenticateJWT, getProfileById);
-router.get('/', getAllDoctors);
+router.get('/',authenticateJWT, getAllDoctors);
 
 export default router;
