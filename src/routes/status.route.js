@@ -1,6 +1,6 @@
 import express from 'express';
 import { getAllAppointmentStatus, getAllStatus } from '../controllers/status.controller.js';
-import { authenticateJWT } from 'src/Auth/middleware.js';
+import { authenticateJWT } from '../Auth/middleware.js';
 
 const router = express.Router();
 

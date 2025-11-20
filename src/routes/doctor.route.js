@@ -4,7 +4,7 @@ import { authenticateJWT } from '../Auth/middleware.js';
 
 const router = express.Router();
 
-router.post('/register', createDoctor);
+router.post('/register',authenticateJWT, createDoctor);
 router.post('/login', doctorLogin)
 router.get('/profile', authenticateJWT, getProfile);
 router.put('/profile', authenticateJWT, updateProfile);

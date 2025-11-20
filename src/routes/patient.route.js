@@ -1,6 +1,6 @@
 import express from 'express';
 import { createPatient, getAllPatients, getPatient, updatePatient } from '../controllers/patient.controller.js';
-import { authenticateJWT } from 'src/Auth/middleware.js';
+import { authenticateJWT } from '../Auth/middleware.js';
 
 const router = express.Router();
 router.get('/', authenticateJWT, getAllPatients);
