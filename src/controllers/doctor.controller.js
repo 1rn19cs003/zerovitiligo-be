@@ -5,6 +5,8 @@ import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, update
 
 const ACCESS_SECRET = process.env.JWT_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
+const ACCESS_EXPIRES_IN = process.env.ACCESS_EXPIRES_IN || "15m";
+const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN || "7d";
 
 export const createDoctor = async (req, res, next) => {
     try {
@@ -33,58 +35,59 @@ export const createDoctor = async (req, res, next) => {
 };
 
 export const doctorLogin = async (req, res, next) => {
-    try {
-        const { email, password, role } = req.body;
+  try {
+    const { email, password, role } = req.body;
 
-        const doctor = await getDoctorByCreds({ email, role });
-        if (!doctor) {
-            return res.status(401).json({ message: "Invalid credentials." });
-        }
+    const doctor = await getDoctorByCreds({ email, role });
+    if (!doctor) return res.status(401).json({ message: "Invalid credentials" });
 
-        const passwordMatch = await bcrypt.compare(password, doctor.password);
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Invalid credentials." });
-        }
+    const passwordMatch = await bcrypt.compare(password, doctor.password);
+    if (!passwordMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-        const accessToken = jwt.sign(
-            {
-                id: doctor.id,
-                email: doctor.email,
-                role: doctor.role,
-            },
-            ACCESS_SECRET,
-            { expiresIn: process.env.ACCESS_EXPIRES_IN || "15m" }
-        );
+    const payload = {
+      id: doctor.id,
+      email: doctor.email,
+      role: doctor.role,
+    };
 
+    const accessToken = jwt.sign(payload, ACCESS_SECRET, {
+      expiresIn: ACCESS_EXPIRES_IN,
+    });
 
-        const refreshToken = jwt.sign(
-            {
-                id: doctor.id,
-                email: doctor.email,
-            },
-            REFRESH_SECRET,
-            { expiresIn: process.env.REFRESH_EXPIRES_IN || "7d" }
-        );
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            secure: false,
-            sameSite: "strict",
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-        });
+    const refreshToken = jwt.sign({ id: doctor.id }, REFRESH_SECRET, {
+      expiresIn: REFRESH_EXPIRES_IN,
+    });
 
-        return res.status(200).json({
-            accessToken,
-            user: {
-                id: doctor.id,
-                name: doctor.name,
-                email: doctor.email,
-                role: doctor.role,
-            },
-        });
-    } catch (error) {
-        next(error);
-    }
+    // Set httpOnly, secure cookies
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      user: {
+        id: doctor.id,
+        name: doctor.name,
+        email: doctor.email,
+        role: doctor.role,
+      },
+      message: "Login successful",
+    });
+  } catch (error) {
+    next(error);
+  }
 };
+
 
 // Fetch profile for authenticated user
 export const getProfile = async (req, res, next) => {

@@ -1,6 +1,6 @@
 import express from 'express';
 import { createAppointment, getAppointmentsByDoctor, getAppointmentsByPatient, updateAppointmentByAppointmentId } from '../controllers/appointment.controller.js';
-import { authenticateJWT } from '../Auth/middleware.js';
+import { authenticateJWT } from '../middleware/middleware.js';
 
 const router = express.Router();
 
