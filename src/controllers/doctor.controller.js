@@ -1,9 +1,11 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
 
-const JWT_SECRET = process.env.JWT_SECRET
+const ACCESS_SECRET = process.env.JWT_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
+
 export const createDoctor = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
@@ -35,35 +37,49 @@ export const doctorLogin = async (req, res, next) => {
         const { email, password, role } = req.body;
 
         const doctor = await getDoctorByCreds({ email, role });
-
         if (!doctor) {
             return res.status(401).json({ message: "Invalid credentials." });
         }
 
         const passwordMatch = await bcrypt.compare(password, doctor.password);
-
         if (!passwordMatch) {
             return res.status(401).json({ message: "Invalid credentials." });
         }
 
-        const token = jwt.sign(
+        const accessToken = jwt.sign(
             {
                 id: doctor.id,
                 email: doctor.email,
                 role: doctor.role,
             },
-            JWT_SECRET,
-            { expiresIn: '4h' }
+            ACCESS_SECRET,
+            { expiresIn: process.env.ACCESS_EXPIRES_IN || "15m" }
         );
 
+
+        const refreshToken = jwt.sign(
+            {
+                id: doctor.id,
+                email: doctor.email,
+            },
+            REFRESH_SECRET,
+            { expiresIn: process.env.REFRESH_EXPIRES_IN || "7d" }
+        );
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
         return res.status(200).json({
-            token,
+            accessToken,
             user: {
                 id: doctor.id,
                 name: doctor.name,
                 email: doctor.email,
-                role: doctor.role
-            }
+                role: doctor.role,
+            },
         });
     } catch (error) {
         next(error);
