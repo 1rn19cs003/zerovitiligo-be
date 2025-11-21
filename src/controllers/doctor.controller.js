@@ -1,9 +1,13 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
 
-const JWT_SECRET = process.env.JWT_SECRET
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
+const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN || "7d";
+const isProd = process.env.NODE_ENV === "production";
+
 export const createDoctor = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
@@ -35,40 +39,82 @@ export const doctorLogin = async (req, res, next) => {
         const { email, password, role } = req.body;
 
         const doctor = await getDoctorByCreds({ email, role });
-
-        if (!doctor) {
-            return res.status(401).json({ message: "Invalid credentials." });
-        }
+        if (!doctor) return res.status(401).json({ message: "Invalid credentials" });
 
         const passwordMatch = await bcrypt.compare(password, doctor.password);
+        if (!passwordMatch)
+            return res.status(401).json({ message: "Invalid credentials" });
 
-        if (!passwordMatch) {
-            return res.status(401).json({ message: "Invalid credentials." });
-        }
+        const payload = {
+            id: doctor.id,
+            email: doctor.email,
+            role: doctor.role,
+        };
 
-        const token = jwt.sign(
-            {
-                id: doctor.id,
-                email: doctor.email,
-                role: doctor.role,
-            },
-            JWT_SECRET,
-            { expiresIn: '4h' }
+        const accessToken = jwt.sign(
+            payload,
+            ACCESS_SECRET,
+            { expiresIn: "15m" }
         );
 
+
+        const refreshToken = jwt.sign({ id: doctor.id }, REFRESH_SECRET, {
+            expiresIn: REFRESH_EXPIRES_IN,
+        });
+
+        // Set httpOnly, secure cookies
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+            maxAge: 15 * 60 * 1000,
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: isProd,
+            ssameSite: isProd ? "none" : "lax",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
         return res.status(200).json({
-            token,
             user: {
                 id: doctor.id,
                 name: doctor.name,
                 email: doctor.email,
-                role: doctor.role
-            }
+                role: doctor.role,
+            },
+            message: "Login successful",
         });
     } catch (error) {
         next(error);
     }
 };
+
+export const doctorLogout = async (req, res) => {
+    try {
+        res.clearCookie("accessToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+        });
+
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "strict",
+        });
+
+        return res.status(200).json({
+            message: "Logout successful",
+        });
+    } catch (error) {
+        console.error("Logout error:", error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
+
+
 
 // Fetch profile for authenticated user
 export const getProfile = async (req, res, next) => {

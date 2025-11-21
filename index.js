@@ -4,11 +4,13 @@ import cors from 'cors';
 import router from './src/routes/index.js';
 import errorMiddleware from './src/middleware/error.js';
 import prisma from './prisma.setup.js';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 const port = process.env.PORT || 8000
 
 app.use(express.json())
+app.use(cookieParser());
 
 // Database connection test endpoint
 app.get('/testPrismaConnection', async (_req, res) => {
@@ -43,19 +45,19 @@ app.get('/health', async (_req, res) => {
 
   try {
     const startTime = Date.now();
-    
+
     await prisma.$queryRaw`SELECT 1`;
     const endTime = Date.now();
-    
+
     healthCheck.database.status = 'connected';
     healthCheck.database.responseTime = `${endTime - startTime}ms`;
-    
+
     res.status(200).json(healthCheck);
   } catch (error) {
     healthCheck.success = false;
     healthCheck.database.status = 'disconnected';
     healthCheck.error = error.message;
-    
+
     res.status(503).json(healthCheck);
   }
 });
@@ -87,7 +89,7 @@ app.get('/live', (_req, res) => {
 
 
 app.use(cors({
-  origin: true, 
+  origin: true,
   credentials: true
 }));
 

@@ -1,11 +1,12 @@
 import express from 'express';
 import { createAppointment, getAppointmentsByDoctor, getAppointmentsByPatient, updateAppointmentByAppointmentId } from '../controllers/appointment.controller.js';
+import { authenticateJWT } from '../middleware/middleware.js';
 
 const router = express.Router();
 
-router.post('/', createAppointment);
-router.get('/', getAppointmentsByDoctor)
-router.get('/patient/', getAppointmentsByPatient)
-router.patch('/', updateAppointmentByAppointmentId)
+router.post('/',authenticateJWT, createAppointment);
+router.get('/',authenticateJWT, getAppointmentsByDoctor)
+router.get('/patient/',authenticateJWT, getAppointmentsByPatient)
+router.patch('/',authenticateJWT, updateAppointmentByAppointmentId)
 
 export default router;
