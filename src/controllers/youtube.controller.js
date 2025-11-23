@@ -10,9 +10,11 @@ export const getAllUrl = async (req, res, next) => {
 };
 export const addNewUrl = async (req, res, next) => {
     try {
-        const { url } = req.body;
+        const { url, title, author } = req.body;
         const payload = {
-            url
+            url,
+            title,
+            author
         }
         const response = await addNewYoutubeUrl(payload);
         return res.status(200).json({ success: true, data: response });
