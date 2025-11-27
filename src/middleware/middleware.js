@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
-const ACCESS_EXPIRES_IN = "15m";
+const ACCESS_EXPIRES_IN = "120m";
 const isProd = process.env.NODE_ENV === "production";
 
 export const authenticateJWT = (req, res, next) => {
