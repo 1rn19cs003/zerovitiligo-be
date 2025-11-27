@@ -10,48 +10,39 @@ datasource db {
 }
 
 model Doctor {
-  id        String     @id @default(uuid())
-  name      String
-  email     String     @unique
-  password  String
-  role      DoctorRole @default(ASSISTANT)
-  mobile    String?
-  createdAt DateTime   @default(now())
-  patients  Patient[]
-
+  id          String        @id @default(uuid())
+  name        String
+  email       String        @unique
+  password    String
+  role        DoctorRole    @default(ASSISTANT)
+  createdAt   DateTime      @default(now())
+  mobile      String?
   Appointment Appointment[]
+  patients    Patient[]
 }
 
 model Patient {
-  id         String  @id @default(uuid())
-  patientId  String  @unique
-  name       String
-  age        Int
-  mobile     String  @unique
-  bodyWeight Float?
-  address    String?
-
-  state String?
-
+  id               String        @id @default(uuid())
+  name             String
+  age              Int
+  bodyWeight       Float?
+  address          String?
   vitiligoDuration String?
   currentMedicine  String?
   vaccineDoses     String?
-
-  // Disease-related fields updated
-  hasDisease     String?
-  diseaseDetails String?
-
-  familyHistory String?
-  status        Status   @default(NEW_REGISTRATION)
-  doctorId      String?
-  assistantId   String?
-  createdAt     DateTime @default(now())
-
-  // Relations
-  images Image[]
-  doctor Doctor? @relation(fields: [doctorId], references: [id])
-
-  Appointment Appointment[]
+  familyHistory    String?
+  status           Status        @default(NEW_REGISTRATION)
+  doctorId         String?
+  assistantId      String?
+  createdAt        DateTime      @default(now())
+  diseaseDetails   String?
+  hasDisease       String?
+  patientId        String        @unique
+  state            String?
+  mobile           String        @unique
+  Appointment      Appointment[]
+  images           Image[]
+  doctor           Doctor?       @relation(fields: [doctorId], references: [id])
 }
 
 model Image {
@@ -70,16 +61,13 @@ model Appointment {
   startTime       DateTime
   endTime         DateTime?
   reason          String?
-  medication      String?
   status          AppointmentStatus @default(SCHEDULED)
   notes           String?
-
-  // Relations
-  doctor  Doctor  @relation(fields: [doctorId], references: [id])
-  patient Patient @relation(fields: [patientId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  medication      String?
+  doctor          Doctor            @relation(fields: [doctorId], references: [id])
+  patient         Patient           @relation(fields: [patientId], references: [id])
 }
 
 model YoutubeVideo {
@@ -89,6 +77,12 @@ model YoutubeVideo {
   title     String?
   author    String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VisitorCounter {
+  id        String   @id @default(uuid())
+  count     Int      @default(0)
   updatedAt DateTime @updatedAt
 }
 
@@ -105,10 +99,10 @@ enum DoctorRole {
 }
 
 enum Status {
-  NEW_REGISTRATION // Patient just registered, no doctor assigned yet
-  UNDER_TREATMENT // Actively receiving treatment
-  TREATMENT_COMPLETED // Treatment completed, patient recovered or discharged
-  PAUSE // Treatment completed, patient recovered or discharged
-  FOLLOW_UP // Under observation or periodic review
-  BLOCKED // Under observation or periodic review
+  NEW_REGISTRATION
+  UNDER_TREATMENT
+  TREATMENT_COMPLETED
+  PAUSE
+  FOLLOW_UP
+  BLOCKED
 }
