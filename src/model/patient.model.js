@@ -72,3 +72,15 @@ export const createNewPatient = async (payload) => {
     throw err;
   }
 };
+
+export const deletePatientWithID = async (id) => {
+  try {
+    return await prisma.patient.delete({
+      where: {
+        patientId: id
+      }
+    })
+  } catch (error) {
+    throw error;
+  }
+}
