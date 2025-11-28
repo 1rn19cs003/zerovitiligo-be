@@ -160,7 +160,7 @@ export const deletePatient = async (req, res, next) => {
                 message: 'Patient not found',
             });
         }
-        const deletedPatient = await deletePatientWithID(id);
+        const deletedPatient = await deletePatientWithID(patient.id);
         return res.status(200).json({
             success: true,
             data: deletedPatient,
