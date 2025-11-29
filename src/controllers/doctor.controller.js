@@ -8,6 +8,10 @@ const REFRESH_SECRET = process.env.REFRESH_SECRET;
 const REFRESH_EXPIRES_IN = process.env.REFRESH_EXPIRES_IN || "7d";
 const isProd = process.env.NODE_ENV === "production";
 
+if (!ACCESS_SECRET || !REFRESH_SECRET) {
+    throw new Error("ACCESS_SECRET and REFRESH_SECRET must be defined in environment variables");
+}
+
 export const createDoctor = async (req, res, next) => {
     try {
         const { name, email, password, role } = req.body;
@@ -62,7 +66,6 @@ export const doctorLogin = async (req, res, next) => {
             expiresIn: REFRESH_EXPIRES_IN,
         });
 
-        // Set httpOnly, secure cookies
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: isProd,
@@ -73,7 +76,7 @@ export const doctorLogin = async (req, res, next) => {
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: isProd,
-            ssameSite: isProd ? "none" : "lax",
+            sameSite: isProd ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
@@ -114,6 +117,77 @@ export const doctorLogout = async (req, res) => {
     }
 };
 
+/**
+ * Refresh access token using refresh token
+ * This endpoint validates the refresh token and issues a new access token
+ */
+export const refreshToken = async (req, res, next) => {
+    try {
+        const { refreshToken } = req.cookies;
+
+        if (!refreshToken) {
+            return res.status(401).json({
+                message: "Refresh token not found",
+                error: "No refresh token provided"
+            });
+        }
+
+        let decoded;
+        try {
+            decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+        } catch (error) {
+            return res.status(401).json({
+                message: "Invalid or expired refresh token",
+                error: error.message
+            });
+        }
+
+        if (typeof decoded === 'string' || !decoded.id) {
+            return res.status(401).json({
+                message: "Invalid token payload "
+            });
+        }
+
+        const doctor = await getDoctorById(decoded.id);
+        if (!doctor) {
+            return res.status(401).json({
+                message: "User not found"
+            });
+        }
+
+        const payload = {
+            id: doctor.id,
+            email: doctor.email,
+            role: doctor.role,
+        };
+
+        const newAccessToken = jwt.sign(
+            payload,
+            ACCESS_SECRET,
+            { expiresIn: "15m" }
+        );
+
+        res.cookie("accessToken", newAccessToken, {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+            maxAge: 15 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            message: "Token refreshed successfully",
+            user: {
+                id: doctor.id,
+                name: doctor.name,
+                email: doctor.email,
+                role: doctor.role,
+            }
+        });
+    } catch (error) {
+        console.error("Token refresh error:", error);
+        next(error);
+    }
+};
 
 
 // Fetch profile for authenticated user

@@ -1,4 +1,4 @@
-import { createNewPatient, getAllPatientsData, getPatientDataWithId, updatePatientWithID } from "../model/patient.model.js";
+import { createNewPatient, deletePatientWithID, getAllPatientsData, getPatientDataWithId, updatePatientWithID } from "../model/patient.model.js";
 import { generatePatientId, patientValidationSchema } from "../Utils/patient.utils.js";
 
 export const getAllPatients = async (req, res, next) => {
@@ -149,3 +149,25 @@ export const createPatient = async (req, res, next) => {
         next(error);
     }
 }
+
+export const deletePatient = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const patient = await getPatientDataWithId(id);
+        if (!patient) {
+            return res.status(404).json({
+                success: false,
+                message: 'Patient not found',
+            });
+        }
+        const deletedPatient = await deletePatientWithID(patient.id);
+        return res.status(200).json({
+            success: true,
+            data: deletedPatient,
+            message: 'Patient deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+    

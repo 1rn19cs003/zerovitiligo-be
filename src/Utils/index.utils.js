@@ -17,3 +17,8 @@ export const generateTokens = (user) => {
 };
 
 
+export const ROLES = {
+  ADMIN: "ADMIN",
+  ASSISTANT: "ASSISTANT",
+  USER: "USER"
+}

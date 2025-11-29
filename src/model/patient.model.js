@@ -10,7 +10,7 @@ export const getAllPatientsData = async () => {
             status: AppointmentStatus.SCHEDULED,
           },
           select: {
-            status:true,
+            status: true,
             createdAt: true,
             appointmentDate: true,
           }
@@ -72,3 +72,21 @@ export const createNewPatient = async (payload) => {
     throw err;
   }
 };
+
+export const deletePatientWithID = async (uuid) => {
+  try {
+    // 1. Delete all related records first (to satisfy foreign key constraints)
+    //    and then delete the patient.
+    return await prisma.$transaction(async (tx) => {
+      await tx.appointment.deleteMany({ where: { patientId: uuid } });
+      await tx.medicineDiary.deleteMany({ where: { patientId: uuid } });
+      await tx.image.deleteMany({ where: { patientId: uuid } });
+
+      return await tx.patient.delete({
+        where: { id: uuid }
+      });
+    });
+  } catch (error) {
+    throw error;
+  }
+}
