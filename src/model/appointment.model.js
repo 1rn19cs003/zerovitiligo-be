@@ -1,3 +1,4 @@
+import { AppointmentStatus } from "../../generated/prisma/index.js";
 import prisma from '../../prisma.setup.js'
 
 
@@ -55,3 +56,25 @@ export const updateAppointment = async (appointmentId, payload) => {
     }
 }
 
+export const getAppointmentDataWithId = async (id) => {
+    try {
+        return await prisma.appointment.findUnique({
+            where: { id: id }
+        })
+    } catch (error) {
+        throw error;
+    }
+}
+
+export const rescheduleAppointmentWithID = async (id, payload) => {
+    try {
+        return await prisma.appointment.update({
+            where: {
+                id: id
+            },
+            data: payload
+        })
+    } catch (error) {
+        throw error;
+    }
+}

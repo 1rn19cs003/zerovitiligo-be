@@ -1,5 +1,5 @@
 import express from 'express';
-import { createAppointment, getAppointmentsByDoctor, getAppointmentsByPatient, updateAppointmentByAppointmentId } from '../controllers/appointment.controller.js';
+import { createAppointment, getAppointmentsByDoctor, getAppointmentsByPatient, rescheduleAppointment, updateAppointmentByAppointmentId } from '../controllers/appointment.controller.js';
 import { authenticateJWT, authorize } from '../middleware/middleware.js';
 import { ROLES } from '../Utils/index.utils.js';
 
@@ -9,5 +9,5 @@ router.post('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), cre
 router.get('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), getAppointmentsByDoctor)
 router.get('/patient/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), getAppointmentsByPatient)
 router.patch('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), updateAppointmentByAppointmentId)
-
+router.put('/:appointmentId/reschedule', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), rescheduleAppointment);
 export default router;

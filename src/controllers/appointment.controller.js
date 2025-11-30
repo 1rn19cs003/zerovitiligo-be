@@ -1,5 +1,5 @@
 import { AppointmentStatus } from "../../generated/prisma/index.js";
-import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment, updateAppointment } from "../model/appointment.model.js";
+import { getAppointmentsByDoc, getAppointmentsByPat, newAppointment, updateAppointment, getAppointmentDataWithId, rescheduleAppointmentWithID } from "../model/appointment.model.js";
 
 export const createAppointment = async (req, res, next) => {
     try {
@@ -106,6 +106,32 @@ export const updateAppointmentByAppointmentId = async (req, res, next) => {
         const updatedAppomintment = await updateAppointment(appointmentId, payload)
         return res.status(200).json({ success: true, data: updatedAppomintment });
 
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const rescheduleAppointment = async (req, res, next) => {
+    try {
+        const { appointmentId } = req.params;
+        const { appointmentDate } = req.body;
+        const appointment = await getAppointmentDataWithId(appointmentId);
+        if (!appointment) {
+            return res.status(404).json({
+                success: false,
+                message: 'Appointment not found',
+            });
+        }
+        const payload = {
+            appointmentDate: appointmentDate ? new Date(appointmentDate) : new Date(),
+            status: AppointmentStatus.SCHEDULED
+        }
+        const rescheduledAppointment = await rescheduleAppointmentWithID(appointment.id, payload);
+        return res.status(200).json({
+            success: true,
+            data: rescheduledAppointment,
+            message: 'Appointment rescheduled successfully',
+        });
     } catch (error) {
         next(error);
     }
