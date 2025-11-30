@@ -19,3 +19,16 @@ export const addNewYoutubeUrl = async (payload) => {
         throw err;
     }
 };
+
+export const deleteYoutubeUrl = async (id) => {
+    try {
+        return await prisma.youtubeVideo.delete({
+            where: {
+                id: id,
+            },
+        });
+    } catch (err) {
+        console.log({ eoor: err })
+        throw err;
+    }
+};
