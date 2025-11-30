@@ -6,5 +6,5 @@ import { ROLES } from '../Utils/index.utils.js';
 const router = express.Router();
 router.get('/', getAllUrl);
 router.post('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), addNewUrl);
-router.delete('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), deleteUrl);
+router.delete('/:id', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), deleteUrl);
 export default router;

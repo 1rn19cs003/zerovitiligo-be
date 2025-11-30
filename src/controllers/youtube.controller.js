@@ -25,7 +25,7 @@ export const addNewUrl = async (req, res, next) => {
 
 export const deleteUrl = async (req, res, next) => {
     try {
-        const { id } = req.body;
+        const { id } = req.params;
         const response = await deleteYoutubeUrl(id);
         return res.status(200).json({ success: true, data: response });
     } catch (error) {
