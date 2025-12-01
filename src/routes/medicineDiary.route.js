@@ -5,8 +5,8 @@ import { ROLES } from "../Utils/index.utils.js";
 
 const router = express.Router();
 
-router.post("/", authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), createEntry);
-router.get("/:patientId", authenticateJWT, authorize([ROLES.ADMIN]), getEntriesByPatient);
-router.delete("/:id", authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), deleteEntry);
+router.post("/", authenticateJWT, authorize([ROLES.ADMIN]), createEntry);
+router.get("/:patientId", authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), getEntriesByPatient);
+router.delete("/:id", authenticateJWT, authorize([ROLES.ADMIN]), deleteEntry);
 
 export default router;
