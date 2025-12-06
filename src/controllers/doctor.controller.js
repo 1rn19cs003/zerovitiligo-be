@@ -1,7 +1,7 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
-import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, getDoctorPasswordById, updateDoctorById, deleteDoctorById } from "../model/doctor.model.js";
+import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, getDoctorPasswordById, updateDoctorById, deleteDoctorById, getDoctorPasswordByEmail } from "../model/doctor.model.js";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
@@ -285,35 +285,28 @@ export const deleteDoctor = async (req, res, next) => {
 
 export const changePassword = async (req, res, next) => {
     try {
-        const { oldPassword, newPassword, userId } = req.body;
-        console.log({ re: req.body })
-        // Validate input
+        const { oldPassword, newPassword, email } = req.body;
         if (!oldPassword || !newPassword) {
             return res.status(400).json({
                 error: 'Old password and new password are required'
             });
         }
 
-        // Validate new password length
         if (newPassword.length < 8) {
             return res.status(400).json({
                 error: 'New password must be at least 8 characters long'
             });
         }
-
-        // Fetch current password hash
-        const doctor = await getDoctorPasswordById(userId);
+        const doctor = await getDoctorPasswordByEmail(email);
         if (!doctor) {
             return res.status(404).json({ error: 'User not found' });
         }
 
-        // Verify old password
         const passwordMatch = await bcrypt.compare(oldPassword, doctor.password);
         if (!passwordMatch) {
             return res.status(400).json({ error: 'Current password is incorrect' });
         }
 
-        // Check if new password is different from old password
         const isSamePassword = await bcrypt.compare(newPassword, doctor.password);
         if (isSamePassword) {
             return res.status(400).json({
@@ -321,11 +314,9 @@ export const changePassword = async (req, res, next) => {
             });
         }
 
-        // Hash new password
         const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-        // Update password in database
-        await updateDoctorById(userId, req.user.email, { password: hashedPassword });
+        await updateDoctorById(doctor.id, email, { password: hashedPassword });
 
         return res.status(200).json({
             success: true,

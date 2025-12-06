@@ -153,3 +153,18 @@ export const deleteDoctorById = async (userId) => {
         throw err;
     }
 };
+
+export const getDoctorPasswordByEmail = async (email) => {
+    try {
+        return await prisma.doctor.findUnique({
+            where: { email: email },
+            select: {
+                id: true,
+                password: true,
+            },
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
