@@ -1,7 +1,7 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
-import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById } from "../model/doctoer.model.js";
+import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById, deleteDoctorById } from "../model/doctor.model.js";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
@@ -261,6 +261,23 @@ export const getAllDoctors = async (req, res, next) => {
             success: true,
             data: response
         });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const deleteDoctor = async (req, res, next) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const { doctorId } = req.params;
+
+        const response = await deleteDoctorById(doctorId);
+
+        return res.status(200).json({ success: true, data: response });
     } catch (error) {
         next(error);
     }

@@ -114,7 +114,7 @@ export const updateAppointmentByAppointmentId = async (req, res, next) => {
 export const rescheduleAppointment = async (req, res, next) => {
     try {
         const { appointmentId } = req.params;
-        const { appointmentDate } = req.body;
+        const { appointmentDate, reason, medication, notes } = req.body;
         const appointment = await getAppointmentDataWithId(appointmentId);
         if (!appointment) {
             return res.status(404).json({
@@ -124,6 +124,9 @@ export const rescheduleAppointment = async (req, res, next) => {
         }
         const payload = {
             appointmentDate: appointmentDate ? new Date(appointmentDate) : new Date(),
+            reason,
+            medication,
+            notes,
             status: AppointmentStatus.SCHEDULED
         }
         const rescheduledAppointment = await rescheduleAppointmentWithID(appointment.id, payload);

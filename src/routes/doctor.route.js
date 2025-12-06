@@ -1,5 +1,5 @@
 import express from 'express';
-import { createDoctor, doctorLogin, doctorLogout, refreshToken, getAllDoctors, getProfile, getProfileById, updateProfile } from '../controllers/doctor.controller.js';
+import { createDoctor, doctorLogin, doctorLogout, refreshToken, getAllDoctors, getProfile, getProfileById, updateProfile, deleteDoctor } from '../controllers/doctor.controller.js';
 import { authenticateJWT, authorize } from '../middleware/middleware.js';
 import { ROLES } from '../Utils/index.utils.js';
 
@@ -13,5 +13,6 @@ router.get('/profile', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]
 router.put('/profile', authenticateJWT, authorize([ROLES.ADMIN]), updateProfile);
 router.get('/profileId/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), getProfileById);
 router.get('/', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), getAllDoctors);
+router.delete('/:doctorId', authenticateJWT, authorize([ROLES.ADMIN]), deleteDoctor);
 
 export default router;

@@ -72,7 +72,7 @@ export const getAllDocData = async () => {
     try {
         return await prisma.doctor.findMany({
             select: {
-                id:true,
+                id: true,
                 name: true,
                 email: true,
                 createdAt: true,
@@ -85,3 +85,55 @@ export const getAllDocData = async () => {
     }
 };
 
+export const deleteDoctorById = async (userId) => {
+    try {
+        const doctor = await prisma.doctor.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                mobile: true,
+            },
+        });
+
+        if (!doctor) {
+            throw new Error('Doctor not found');
+        }
+
+        // Use a transaction to handle related records
+        return await prisma.$transaction(async (prisma) => {
+            // 1. Delete related Appointments
+            await prisma.appointment.deleteMany({
+                where: { doctorId: userId },
+            });
+
+            // 2. Delete related MedicineDiaries (created by this doctor)
+            await prisma.medicineDiary.deleteMany({
+                where: { createdBy: userId },
+            });
+
+            // 3. Update related Patients (set doctorId to null)
+            await prisma.patient.updateMany({
+                where: { doctorId: userId },
+                data: { doctorId: null },
+            });
+
+            // 4. Delete the Doctor
+            return await prisma.doctor.delete({
+                where: { id: userId },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    mobile: true,
+                },
+            });
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
