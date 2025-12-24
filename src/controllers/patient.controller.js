@@ -178,7 +178,7 @@ export const updatePatientStatus = async (req, res, next) => {
         const { id } = req.params;
         const patient = await getPatientDataWithId(id);
         if (!patient) {
-            return res.status(401).json({
+            return res.status(404).json({
                 success: false,
                 message: 'Patient not found',
             });

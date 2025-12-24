@@ -9,5 +9,5 @@ router.get('/:id', authenticateJWT, getPatient);
 router.put('/:id', authenticateJWT, updatePatient);
 router.delete('/:id', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), deletePatient);
 router.post('/', createPatient);
-router.post('/update-status/:id', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), updatePatientStatus);
+router.put('/update-status/:id', authenticateJWT, authorize([ROLES.ADMIN, ROLES.ASSISTANT]), updatePatientStatus);
 export default router;
