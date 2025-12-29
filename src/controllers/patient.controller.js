@@ -183,7 +183,7 @@ export const updatePatientStatus = async (req, res, next) => {
                 message: 'Patient not found',
             });
         }
-        const updatedPatient = await updatePatientWithID(id, { status: req.body.status });
+        const updatedPatient = await updatePatientWithID(patient.patientId, { status: req.body.status });
         return res.status(200).json({
             success: true,
             data: updatedPatient,
