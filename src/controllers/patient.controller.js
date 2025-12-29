@@ -116,6 +116,7 @@ export const createPatient = async (req, res, next) => {
             state,
             hasDisease,
             diseaseDetails,
+            status,
         } = req.body;
 
 
@@ -132,7 +133,8 @@ export const createPatient = async (req, res, next) => {
             hasDisease: hasDisease === "Yes" ? hasDisease : "No",
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
             diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,
-            vaccineDoses: vaccineDoses
+            vaccineDoses: vaccineDoses,
+            status: status,
         };
 
         // Save data to db
@@ -170,4 +172,24 @@ export const deletePatient = async (req, res, next) => {
         next(error);
     }
 }
-    
+
+export const updatePatientStatus = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+        const patient = await getPatientDataWithId(id);
+        if (!patient) {
+            return res.status(404).json({
+                success: false,
+                message: 'Patient not found',
+            });
+        }
+        const updatedPatient = await updatePatientWithID(patient.patientId, { status: req.body.status });
+        return res.status(200).json({
+            success: true,
+            data: updatedPatient,
+            message: 'Patient status updated successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+}

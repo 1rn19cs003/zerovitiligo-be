@@ -1,7 +1,7 @@
 // @ts-ignore
 import bcrypt from 'bcryptjs';
 import jwt from "jsonwebtoken";
-import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, updateDoctorById, deleteDoctorById } from "../model/doctor.model.js";
+import { createNewDoctor, getAllDocData, getDoctorByCreds, getDoctorById, getDoctorPasswordById, updateDoctorById, deleteDoctorById, getDoctorPasswordByEmail } from "../model/doctor.model.js";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;
@@ -278,6 +278,50 @@ export const deleteDoctor = async (req, res, next) => {
         const response = await deleteDoctorById(doctorId);
 
         return res.status(200).json({ success: true, data: response });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const changePassword = async (req, res, next) => {
+    try {
+        const { oldPassword, newPassword, email } = req.body;
+        if (!oldPassword || !newPassword) {
+            return res.status(400).json({
+                error: 'Old password and new password are required'
+            });
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({
+                error: 'New password must be at least 8 characters long'
+            });
+        }
+        const doctor = await getDoctorPasswordByEmail(email);
+        if (!doctor) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const passwordMatch = await bcrypt.compare(oldPassword, doctor.password);
+        if (!passwordMatch) {
+            return res.status(400).json({ error: 'Current password is incorrect' });
+        }
+
+        const isSamePassword = await bcrypt.compare(newPassword, doctor.password);
+        if (isSamePassword) {
+            return res.status(400).json({
+                error: 'New password must be different from current password'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await updateDoctorById(doctor.id, email, { password: hashedPassword });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Password changed successfully'
+        });
     } catch (error) {
         next(error);
     }

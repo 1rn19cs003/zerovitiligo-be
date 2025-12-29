@@ -25,9 +25,9 @@ export const getAllPatientsData = async () => {
 
 export const getPatientDataWithId = async (id) => {
   try {
-    return await prisma.patient.findUnique({
+    return await prisma.patient.findFirst({
       where: {
-        patientId: id
+        OR: [{ patientId: id }, { id: id }]
       },
       include: {
         Appointment: {

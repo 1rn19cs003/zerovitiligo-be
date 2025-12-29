@@ -49,6 +49,22 @@ export const getDoctorById = async (userId) => {
     }
 };
 
+export const getDoctorPasswordById = async (userId) => {
+    try {
+        return await prisma.doctor.findUnique({
+            where: { id: userId },
+            select: {
+                id: true,
+                password: true,
+            },
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
+
 export const updateDoctorById = async (userId, email, payload) => {
     try {
         return await prisma.doctor.update({
@@ -131,6 +147,21 @@ export const deleteDoctorById = async (userId) => {
                     mobile: true,
                 },
             });
+        });
+    } catch (err) {
+        console.log({ error: err });
+        throw err;
+    }
+};
+
+export const getDoctorPasswordByEmail = async (email) => {
+    try {
+        return await prisma.doctor.findUnique({
+            where: { email: email },
+            select: {
+                id: true,
+                password: true,
+            },
         });
     } catch (err) {
         console.log({ error: err });
