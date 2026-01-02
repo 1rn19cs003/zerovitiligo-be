@@ -1,7 +1,7 @@
 import express from "express";
 import { createEntry, getEntriesByPatient, deleteEntry } from "../controllers/medicineDiary.controller.js";
 import { authenticateJWT, authorize } from "../middleware/middleware.js";
-import { ROLES } from "../Utils/index.utils.js";
+import { ROLES } from "../utils/index.utils.js";
 
 const router = express.Router();
 

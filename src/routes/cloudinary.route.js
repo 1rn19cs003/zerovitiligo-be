@@ -1,7 +1,7 @@
 import express from 'express';
 import { deleteImage, listImages, getUploadSignature } from '../controllers/cloudinary.controller.js';
 import { authenticateJWT, authorize } from '../middleware/middleware.js';
-import { ROLES } from '../Utils/index.utils.js';
+import { ROLES } from '../utils/index.utils.js';
 
 const router = express.Router();
 

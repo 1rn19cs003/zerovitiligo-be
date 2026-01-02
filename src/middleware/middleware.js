@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { ROLES } from "../Utils/index.utils.js";
+import { ROLES } from "../utils/index.utils.js";
 
 const ACCESS_SECRET = process.env.ACCESS_SECRET;
 const REFRESH_SECRET = process.env.REFRESH_SECRET;

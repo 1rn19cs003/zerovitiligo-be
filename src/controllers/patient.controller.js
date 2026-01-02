@@ -1,5 +1,5 @@
 import { createNewPatient, deletePatientWithID, getAllPatientsData, getPatientDataWithId, updatePatientWithID } from "../model/patient.model.js";
-import { generatePatientId, patientValidationSchema } from "../Utils/patient.utils.js";
+import { generatePatientId, patientValidationSchema } from "../utils/patient.utils.js";
 import { Gender } from "../../generated/prisma/index.js";
 
 export const getAllPatients = async (req, res, next) => {
