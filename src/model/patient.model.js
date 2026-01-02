@@ -7,7 +7,9 @@ export const getAllPatientsData = async () => {
       include: {
         Appointment: {
           where: {
-            status: AppointmentStatus.SCHEDULED,
+            status: {
+              in: [AppointmentStatus.SCHEDULED, AppointmentStatus.COMPLETED]
+            }
           },
           select: {
             status: true,

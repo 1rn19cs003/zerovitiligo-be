@@ -15,8 +15,7 @@ export const getAllPatients = async (req, res, next) => {
             status: data.status || 'N/A',
             createdAt: data.createdAt || 'N/A',
             gender: data.gender || 'N/A',
-            appointmentDate: data?.Appointment?.[0]?.appointmentDate,
-            appointmentStatus: data?.Appointment?.[0]?.status,
+            appointmentData: data?.Appointment
         }));
 
         return res.status(200).json({ data: formattedResponse });
