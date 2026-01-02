@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 function generatePatientData(count) {
     const basePatients = [
         {
-            patientId: "ZVG20",
+            patientId: "ZVG2601020016",
             name: "Siddharth Kumar",
             age: 35,
             mobile: "6386549132",
@@ -26,12 +26,12 @@ function generatePatientData(count) {
 
     // Repeat or slice array based on requested count
     const result = [];
-    for (let i = 60; i < count; i++) {
+    for (let i = 16; i < count; i++) {
         const base = basePatients[i % basePatients.length];
         // Generate unique patientId and mobile by appending index
         result.push({
             ...base,
-            patientId: `${base.patientId}_${i + 1}`,
+            patientId: `${base.patientId}${i + 1}`,
             mobile: (parseInt(base.mobile) + i).toString(),
         });
     }
@@ -65,7 +65,7 @@ async function seedDoctorTableWithADMIN() {
             name: 'Admin User One',
             email: 'admin@gmail.com',
             role: 'ADMIN',
-            password:await bcrypt.hash('admin', 10),
+            password: await bcrypt.hash('admin', 10),
         }
     ];
 
@@ -78,8 +78,8 @@ async function seedDoctorTableWithADMIN() {
 
 // Main seed function
 async function main() {
-    // await seedPatients(90);       // Seed 10 patient rows
-    await seedDoctorTableWithADMIN();   // Example: seed 5 rows for other table
+    await seedPatients(90);       // Seed 10 patient rows
+    // await seedDoctorTableWithADMIN();   // Example: seed 5 rows for other table
 }
 
 main()
