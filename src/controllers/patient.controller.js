@@ -1,5 +1,6 @@
 import { createNewPatient, deletePatientWithID, getAllPatientsData, getPatientDataWithId, updatePatientWithID } from "../model/patient.model.js";
 import { generatePatientId, patientValidationSchema } from "../Utils/patient.utils.js";
+import { Gender } from "../../generated/prisma/index.js";
 
 export const getAllPatients = async (req, res, next) => {
     try {
@@ -13,6 +14,7 @@ export const getAllPatients = async (req, res, next) => {
             state: data.state || 'N/A',
             status: data.status || 'N/A',
             createdAt: data.createdAt || 'N/A',
+            gender: data.gender || 'N/A',
             appointmentDate: data?.Appointment?.[0]?.appointmentDate,
             appointmentStatus: data?.Appointment?.[0]?.status,
         }));
@@ -66,6 +68,7 @@ export const updatePatient = async (req, res, next) => {
             diseaseDetails,
             familyHistory,
             status,
+            gender,
         } = req.body;
 
         const updateData = {
@@ -82,6 +85,7 @@ export const updatePatient = async (req, res, next) => {
             diseaseDetails,
             familyHistory,
             status,
+            gender,
         }
 
         const updatedPatient = await updatePatientWithID(id, updateData);
@@ -117,6 +121,7 @@ export const createPatient = async (req, res, next) => {
             hasDisease,
             diseaseDetails,
             status,
+            gender,
         } = req.body;
 
 
@@ -134,6 +139,7 @@ export const createPatient = async (req, res, next) => {
             bodyWeight: bodyWeight ? parseFloat(bodyWeight) : null,
             diseaseDetails: hasDisease === "Yes" ? diseaseDetails || null : null,
             vaccineDoses: vaccineDoses,
+            gender: gender ? gender.toUpperCase() : Gender.OTHER,
             status: status,
         };
 

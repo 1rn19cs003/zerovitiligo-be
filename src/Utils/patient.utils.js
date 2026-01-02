@@ -38,6 +38,10 @@ export const patientValidationSchema = Yup.object({
     .required("Mobile number is required")
     .matches(/^\+?[0-9\s-]{10,15}$/, "Enter a valid mobile number"),
 
+  gender: Yup.string()
+    .oneOf(["Male", "Female", "Other", "MALE", "FEMALE", "OTHER"], "Invalid gender")
+    .required("Gender is required"),
+
   // === Location Logic ===
   state: Yup.string().required("Please select your state"),
 
