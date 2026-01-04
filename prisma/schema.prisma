@@ -10,20 +10,20 @@ datasource db {
 }
 
 model Doctor {
-  id             String           @id @default(uuid())
-  name           String
-  email          String           @unique
-  password       String
-  role           DoctorRole       @default(ASSISTANT)
-  createdAt      DateTime         @default(now())
-  mobile         String?
-  Appointment    Appointment[]
-  patients       Patient[]
+  id              String          @id @default(uuid())
+  name            String
+  email           String          @unique
+  password        String
+  role            DoctorRole      @default(ASSISTANT)
+  createdAt       DateTime        @default(now())
+  mobile          String?
+  Appointment     Appointment[]
   medicineDiaries MedicineDiary[]
+  patients        Patient[]
 }
 
 model Patient {
-  id               String           @id @default(uuid())
+  id               String          @id @default(uuid())
   name             String
   age              Int
   bodyWeight       Float?
@@ -32,19 +32,20 @@ model Patient {
   currentMedicine  String?
   vaccineDoses     String?
   familyHistory    String?
-  status           Status           @default(NEW_REGISTRATION)
+  status           Status          @default(NEW_REGISTRATION)
   doctorId         String?
   assistantId      String?
-  createdAt        DateTime         @default(now())
+  createdAt        DateTime        @default(now())
   diseaseDetails   String?
   hasDisease       String?
-  patientId        String           @unique
+  patientId        String          @unique
   state            String?
-  mobile           String           @unique
+  mobile           String          @unique
+  gender           Gender          @default(MALE)
   Appointment      Appointment[]
   images           Image[]
   medicineDiaries  MedicineDiary[]
-  doctor           Doctor?          @relation(fields: [doctorId], references: [id])
+  doctor           Doctor?         @relation(fields: [doctorId], references: [id])
 }
 
 model Image {
@@ -83,8 +84,8 @@ model MedicineDiary {
   createdBy    String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-  patient      Patient  @relation(fields: [patientId], references: [id])
   doctor       Doctor   @relation(fields: [createdBy], references: [id])
+  patient      Patient  @relation(fields: [patientId], references: [id])
 }
 
 model YoutubeVideo {
@@ -122,4 +123,10 @@ enum Status {
   PAUSE
   FOLLOW_UP
   BLOCKED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
 }
