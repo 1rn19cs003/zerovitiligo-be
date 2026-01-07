@@ -7,6 +7,8 @@ import youtubeRoutes from './youtube.route.js';
 import visitorRoutes from './visitor.route.js';
 import medicineDiaryRoutes from './medicineDiary.route.js';
 import cloudinaryRoutes from './cloudinary.route.js';
+import exportRoutes from './export.route.js';
+
 
 const router = express.Router();
 
@@ -18,5 +20,6 @@ router.use('/youtube', youtubeRoutes);
 router.use('/visitor', visitorRoutes);
 router.use('/medicine-diary', medicineDiaryRoutes);
 router.use('/cloudinary', cloudinaryRoutes);
+router.use('/export', exportRoutes);
 
 export default router;
