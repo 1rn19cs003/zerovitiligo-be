@@ -1,83 +1,20 @@
 
 import prisma from '../../prisma.setup.js';
 
-export const exportAllData = async (req, res, next) => {
+const streamModelData = async (key, modelDelegate, includeOptions, sendEvent) => {
     try {
-        const [
-            patients,
-            doctors,
-            appointments,
-            medicineDiaries,
-            images,
-            youtubeVideos,
-            visitorCounters
-        ] = await Promise.all([
-            prisma.patient.findMany({
-                include: {
-                    Appointment: true,
-                    images: true,
-                    medicineDiaries: true,
-                    doctor: true
-                }
-            }),
-            prisma.doctor.findMany({
-                include: {
-                    Appointment: true,
-                    patients: true,
-                    medicineDiaries: true
-                }
-            }),
-            prisma.appointment.findMany({
-                include: {
-                    doctor: true,
-                    patient: true
-                }
-            }),
-            prisma.medicineDiary.findMany({
-                include: {
-                    doctor: true,
-                    patient: true
-                }
-            }),
-            prisma.image.findMany({
-                include: {
-                    patient: true
-                }
-            }),
-            prisma.youtubeVideo.findMany(),
-            prisma.visitorCounter.findMany()
-        ]);
-
-        const exportData = {
-            patients,
-            doctors,
-            appointments,
-            medicineDiaries,
-            images,
-            youtubeVideos,
-            visitorCounters,
-            metadata: {
-                message: "Full database export including relations",
-                exportedAt: new Date().toISOString(),
-                recordCounts: {
-                    patients: patients.length,
-                    doctors: doctors.length,
-                    appointments: appointments.length,
-                    medicineDiaries: medicineDiaries.length,
-                    images: images.length,
-                    youtubeVideos: youtubeVideos.length
-                }
-            }
-        };
-
-        res.status(200).json(exportData);
+        sendEvent('progress', { message: `Processing ${key}...` });
+        const data = await modelDelegate.findMany({ include: includeOptions });
+        sendEvent('data', { type: key, data });
+        return data.length;
     } catch (error) {
-        next(error);
+        console.error(`Error fetching ${key}:`, error);
+        sendEvent('error', { message: `Failed to fetch ${key}: ${error.message}` });
+        throw error; // Re-throw to handle in main flow
     }
-}
+};
 
 export const exportAllDataSSE = async (req, res, next) => {
-    // Set headers for SSE
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
@@ -89,75 +26,57 @@ export const exportAllDataSSE = async (req, res, next) => {
     };
 
     try {
-        sendEvent('start', { message: 'Starting export process...' });
+        sendEvent('start', { message: 'Initiating database export...' });
 
-        // Fetch and send one by one to demonstrate streaming/progress
+        const counts = {};
 
-        // 1. Patients
-        sendEvent('progress', { message: 'Fetching patients...' });
-        const patients = await prisma.patient.findMany({
-            include: { Appointment: true, images: true, medicineDiaries: true, doctor: true }
-        });
-        sendEvent('data', { type: 'patients', data: patients });
+        // Sequential execution guarantees "Staged" progress updates
 
-        // 2. Doctors
-        sendEvent('progress', { message: 'Fetching doctors...' });
-        const doctors = await prisma.doctor.findMany({
-            include: { Appointment: true, patients: true, medicineDiaries: true }
-        });
-        sendEvent('data', { type: 'doctors', data: doctors });
+        // Stage 1: Core User Data
+        counts.doctors = await streamModelData('doctors', prisma.doctor,
+            { Appointment: true, patients: true, medicineDiaries: true }, sendEvent);
 
-        // 3. Appointments
-        sendEvent('progress', { message: 'Fetching appointments...' });
-        const appointments = await prisma.appointment.findMany({
-            include: { doctor: true, patient: true }
-        });
-        sendEvent('data', { type: 'appointments', data: appointments });
+        counts.patients = await streamModelData('patients', prisma.patient,
+            { Appointment: true, images: true, medicineDiaries: true, doctor: true }, sendEvent);
 
-        // 4. Medicine Diaries
-        sendEvent('progress', { message: 'Fetching medicine diaries...' });
-        const medicineDiaries = await prisma.medicineDiary.findMany({
-            include: { doctor: true, patient: true }
-        });
-        sendEvent('data', { type: 'medicineDiaries', data: medicineDiaries });
+        // Stage 2: Clinical Data
+        counts.appointments = await streamModelData('appointments', prisma.appointment,
+            { doctor: true, patient: true }, sendEvent);
 
-        // 5. Images
-        sendEvent('progress', { message: 'Fetching images...' });
-        const images = await prisma.image.findMany({
-            include: { patient: true }
-        });
-        sendEvent('data', { type: 'images', data: images });
+        counts.medicineDiaries = await streamModelData('medicineDiaries', prisma.medicineDiary,
+            { doctor: true, patient: true }, sendEvent);
 
-        // 6. Youtube
-        sendEvent('progress', { message: 'Fetching videos...' });
-        const youtubeVideos = await prisma.youtubeVideo.findMany();
-        sendEvent('data', { type: 'youtubeVideos', data: youtubeVideos });
+        // Stage 3: Media & Analytics
+        counts.images = await streamModelData('images', prisma.image,
+            { patient: true }, sendEvent);
 
-        // 7. Visitor Counter
-        sendEvent('progress', { message: 'Fetching visitor stats...' });
-        const visitorCounters = await prisma.visitorCounter.findMany();
-        sendEvent('data', { type: 'visitorCounters', data: visitorCounters });
+        counts.youtubeVideos = await streamModelData('youtubeVideos', prisma.youtubeVideo,
+            undefined, sendEvent);
 
-        // Metadata
+        counts.visitorCounters = await streamModelData('visitorCounters', prisma.visitorCounter,
+            undefined, sendEvent);
+
+        sendEvent('progress', { message: 'Finalizing export package...' });
+
         const metadata = {
-            message: "Full database export including relations (Streamed)",
+            message: "Full database export (SSE Stream)",
             exportedAt: new Date().toISOString(),
-            recordCounts: {
-                patients: patients.length,
-                doctors: doctors.length,
-                appointments: appointments.length,
-                medicineDiaries: medicineDiaries.length,
-                images: images.length,
-                youtubeVideos: youtubeVideos.length
-            }
+            recordCounts: counts
         };
         sendEvent('data', { type: 'metadata', data: metadata });
 
-        sendEvent('end', { message: 'Export completed' });
+        sendEvent('end', { message: 'Export completed successfully!' });
         res.end();
+
     } catch (error) {
         console.error("SSE Export Error:", error);
-        sendEvent('error', { message: error.message });
-        res.end();
+        // Connection might be closed by client, or other network error
+        if (!res.headersSent) {
+            res.status(500).json({ error: error.message });
+        } else {
+            // Try to send error event if stream is still open
+            try { sendEvent('error', { message: 'Internal Server Error during stream' }); } catch (e) { }
+            res.end();
+        }
     }
 }
