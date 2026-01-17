@@ -34,9 +34,32 @@ export const getPatient = async (req, res, next) => {
                 message: 'Patient not found',
             });
         }
+
+        const formattedResponse = {
+            id: patient.id,
+            name: patient.name,
+            age: patient.age,
+            mobile: patient.mobile,
+            gender: patient.gender,
+            state: patient.state,
+            bodyWeight: patient.bodyWeight,
+            address: patient.address,
+            vitiligoDuration: patient.vitiligoDuration,
+            currentMedicine: patient.currentMedicine,
+            vaccineDoses: patient.vaccineDoses,
+            hasDisease: patient.hasDisease,
+            diseaseDetails: patient.diseaseDetails,
+            familyHistory: patient.familyHistory,
+            status: patient.status,
+            createdAt: patient.createdAt,
+            doctorId: patient.doctorId,
+            assistantId: patient.assistantId,
+            patientId: patient.patientId,
+            Appointment: patient?.Appointment,
+        }
         return res.status(200).json({
             success: true,
-            data: patient,
+            data: formattedResponse,
         });
     } catch (error) {
         next(error);

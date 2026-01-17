@@ -1,4 +1,3 @@
-import { AppointmentStatus } from "../../generated/prisma/index.js";
 import prisma from '../../prisma.setup.js'
 
 
