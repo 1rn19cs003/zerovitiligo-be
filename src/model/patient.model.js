@@ -14,6 +14,7 @@ export const getAllPatientsData = async () => {
           select: {
             status: true,
             createdAt: true,
+            updatedAt: true,
             appointmentDate: true,
           }
         }
