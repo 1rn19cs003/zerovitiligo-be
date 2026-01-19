@@ -9,12 +9,12 @@ export const getAllPatients = async (req, res, next) => {
             id: data.patientId || 'N/A',
             name: data.name || 'N/A',
             age: data.age || 'N/A',
+            gender: data.gender || 'N/A',
             mobile: data.mobile || 'N/A',
             address: data.address || 'N/A',
             state: data.state || 'N/A',
             status: data.status || 'N/A',
             createdAt: data.createdAt || 'N/A',
-            gender: data.gender || 'N/A',
             appointmentData: data?.Appointment
         }));
 
